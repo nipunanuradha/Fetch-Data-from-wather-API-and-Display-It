@@ -5,6 +5,7 @@ import secrets
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
 
+# ඔයාගේ API Key එක මෙතනට දාන්න
 fetcher = WeatherFetcher("1c79708b20d740c097d145309263001")
 
 @app.route('/', methods=['GET', 'POST'])
@@ -22,15 +23,15 @@ def index():
             weather_data = fetcher.fetch_weather(city)
             if weather_data:
                 city_name = weather_data['location']['name']
+                # History එක update කිරීම
                 if city_name not in session['history']:
                     new_history = [city_name] + session['history']
                     session['history'] = new_history[:5]
                     session.modified = True
                 
-                # Chart එකට පැයෙන් පැයට දත්ත ගැනීම
+                # Chart දත්ත
                 for hour in weather_data['forecast']['forecastday'][0]['hour']:
-                    time_label = hour['time'].split(' ')[1]
-                    hourly_labels.append(time_label)
+                    hourly_labels.append(hour['time'].split(' ')[1])
                     hourly_temps.append(hour['temp_c'])
 
     return render_template('index.html', 

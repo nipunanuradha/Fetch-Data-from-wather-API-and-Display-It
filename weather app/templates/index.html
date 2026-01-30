@@ -3,43 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Dashboard Pro</title>
+    <title>WeatherPro Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>tailwind.config = { darkMode: 'class' }</script>
-    <style>
-        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
-    </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-500 min-h-screen">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-500">
 
-    <div class="max-w-6xl mx-auto p-4 md:p-8">
-        <div class="flex justify-between items-center mb-8">
-            <div>
-                <h1 class="text-3xl font-black">Weather<span class="text-blue-600">Pro</span></h1>
-                <p class="text-slate-500 text-sm font-medium">Advanced Weather Analytics</p>
+    <div class="max-w-7xl mx-auto p-4 md:p-8">
+        <div class="flex justify-between items-center mb-8 bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm">
+            <h1 class="text-2xl font-black text-blue-600">WeatherPro.io</h1>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" class="p-2 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                    <span id="theme-icon">🌙</span>
+                </button>
             </div>
-            <button onclick="toggleTheme()" class="p-3 bg-white dark:bg-slate-800 shadow-lg rounded-2xl text-xl hover:scale-110 transition">
-                <span id="theme-icon">🌙</span>
-            </button>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <div class="lg:col-span-1 space-y-6">
+            <div class="lg:col-span-3 space-y-6">
                 <form method="POST" class="relative">
-                    <input type="text" name="city" placeholder="Search city..." required
-                           class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 shadow-xl outline-none border-2 border-transparent focus:border-blue-500">
-                    <button type="submit" class="absolute right-2 top-2 bg-blue-600 text-white p-2 px-4 rounded-xl font-bold">Go</button>
+                    <input type="text" name="city" placeholder="Search City..." required
+                           class="w-full p-4 rounded-2xl bg-white dark:bg-slate-900 shadow-lg outline-none border-2 border-transparent focus:border-blue-500 transition">
+                    <button type="submit" class="absolute right-2 top-2 bg-blue-600 text-white px-4 py-2 rounded-xl font-bold">Find</button>
                 </form>
 
-                <div class="bg-white dark:bg-slate-800 p-6 rounded-[2rem] shadow-lg">
-                    <h3 class="font-bold mb-4 flex items-center gap-2 text-slate-400">🕒 RECENT</h3>
-                    <div class="flex flex-col gap-2">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-lg">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Recent Searches</h3>
+                    <div class="space-y-2">
                         {% for city in history %}
                         <form method="POST">
                             <input type="hidden" name="city" value="{{ city }}">
-                            <button type="submit" class="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition font-semibold">
+                            <button type="submit" class="w-full text-left p-3 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/30 transition border border-transparent hover:border-blue-200">
                                 📍 {{ city }}
                             </button>
                         </form>
@@ -48,57 +44,75 @@
                 </div>
             </div>
 
-            <div class="lg:col-span-3 space-y-6">
+            <div class="lg:col-span-9 space-y-6">
                 {% if data %}
-                <div class="bg-gradient-to-br from-blue-600 to-blue-800 p-8 rounded-[2.5rem] text-white shadow-2xl flex flex-wrap justify-between items-center">
-                    <div>
-                        <h2 class="text-4xl font-black">{{ data.location.name }}</h2>
-                        <p class="text-blue-100 text-lg">{{ data.location.country }}</p>
-                        <div class="flex items-center gap-4 mt-6">
-                            <h3 class="text-7xl font-black">{{ data.current.temp_c }}°</h3>
-                            <div class="h-12 w-[2px] bg-blue-400"></div>
-                            <div>
-                                <p class="text-xl font-bold">{{ data.current.condition.text }}</p>
-                                <p class="text-blue-200">Feels like {{ data.current.feelslike_c }}°</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-8 rounded-[2.5rem] text-white shadow-2xl overflow-hidden relative">
+                        <div class="relative z-10">
+                            <h2 class="text-3xl font-bold">{{ data.location.name }}</h2>
+                            <p class="opacity-70">{{ data.location.country }}</p>
+                            <div class="flex items-center gap-4 mt-4">
+                                <h3 class="text-7xl font-black">{{ data.current.temp_c }}°</h3>
+                                <img src="{{ data.current.condition.icon }}" class="w-20 h-20">
                             </div>
+                            <p class="mt-2 font-medium">Condition: {{ data.current.condition.text }}</p>
                         </div>
                     </div>
-                    <img src="{{ data.current.condition.icon }}" class="w-40 h-40">
-                </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-md border-b-4 border-blue-500">
-                        <p class="text-slate-400 text-xs font-bold uppercase mb-2">Rain Chance</p>
-                        <p class="text-2xl font-black text-blue-500">{{ data.forecast.forecastday[0].day.daily_chance_of_rain }}%</p>
-                    </div>
-                    <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-md border-b-4 border-orange-500">
-                        <p class="text-slate-400 text-xs font-bold uppercase mb-2">UV Index</p>
-                        <p class="text-2xl font-black text-orange-500">{{ data.current.uv }}</p>
-                    </div>
-                    <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-md border-b-4 border-green-500">
-                        <p class="text-slate-400 text-xs font-bold uppercase mb-2">Humidity</p>
-                        <p class="text-2xl font-black text-green-500">{{ data.current.humidity }}%</p>
-                    </div>
-                    <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl shadow-md border-b-4 border-purple-500">
-                        <p class="text-slate-400 text-xs font-bold uppercase mb-2">Visibility</p>
-                        <p class="text-2xl font-black text-purple-500">{{ data.current.vis_km }} km</p>
+                    <div class="rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800 h-64 md:h-auto">
+                        <iframe width="100%" height="100%" frameborder="0" style="border:0"
+                                src="https://www.google.com/maps?q={{ data.location.name }}+{{ data.location.country }}&output=embed">
+                        </iframe>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-800 p-6 rounded-[2rem] shadow-lg">
-                    <h3 class="font-bold mb-4 opacity-50 uppercase text-xs tracking-widest">24-Hour Temperature</h3>
-                    <canvas id="tempChart" height="120"></canvas>
+                <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-lg">
+                    <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
+                        🍃 Air Quality Index (Detailed)
+                        <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-md">Live Data</span>
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-center">
+                            <p class="text-[10px] font-bold text-slate-400">CO</p>
+                            <p class="text-sm font-black">{{ data.current.air_quality.co|round(1) }}</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-center">
+                            <p class="text-[10px] font-bold text-slate-400">NO₂</p>
+                            <p class="text-sm font-black">{{ data.current.air_quality.no2|round(1) }}</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-center">
+                            <p class="text-[10px] font-bold text-slate-400">O₃</p>
+                            <p class="text-sm font-black">{{ data.current.air_quality.o3|round(1) }}</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-center border-b-2 border-orange-400">
+                            <p class="text-[10px] font-bold text-slate-400">PM₂.₅</p>
+                            <p class="text-sm font-black">{{ data.current.air_quality.pm2_5|round(1) }}</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-center border-b-2 border-red-400">
+                            <p class="text-[10px] font-bold text-slate-400">PM₁₀</p>
+                            <p class="text-sm font-black">{{ data.current.air_quality.pm10|round(1) }}</p>
+                        </div>
+                        <div class="p-4 bg-blue-600 text-white rounded-2xl text-center">
+                            <p class="text-[10px] font-bold opacity-70">US EPA</p>
+                            <p class="text-sm font-black">{{ data.current.air_quality['us-epa-index'] }}</p>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-4">
-                    {% for day in data.forecast.forecastday %}
-                    <div class="bg-white dark:bg-slate-800 p-6 rounded-[2rem] text-center shadow-md border border-transparent hover:border-blue-500 transition">
-                        <p class="font-bold text-slate-500 mb-2">{{ day.date }}</p>
-                        <img src="{{ day.day.condition.icon }}" class="w-16 h-16 mx-auto">
-                        <p class="text-2xl font-black">{{ day.day.avgtemp_c }}°</p>
-                        <p class="text-xs text-blue-500 font-bold mt-1">{{ day.day.daily_chance_of_rain }}% Rain</p>
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-lg">
+                        <canvas id="tempChart" height="180"></canvas>
                     </div>
-                    {% endfor %}
+                    <div class="grid grid-cols-3 gap-4">
+                        {% for day in data.forecast.forecastday %}
+                        <div class="bg-white dark:bg-slate-900 p-4 rounded-[2rem] text-center shadow-lg border border-transparent hover:border-blue-500 transition cursor-default">
+                            <p class="text-[10px] font-bold text-slate-400">{{ day.date[5:] }}</p>
+                            <img src="{{ day.day.condition.icon }}" class="mx-auto w-12 h-12">
+                            <p class="text-lg font-black">{{ day.day.avgtemp_c }}°</p>
+                            <p class="text-[10px] text-blue-500 font-bold">{{ day.day.daily_chance_of_rain }}% Rain</p>
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
                 {% endif %}
             </div>
@@ -106,36 +120,35 @@
     </div>
 
     <script>
-        // Chart Config
-        const ctx = document.getElementById('tempChart');
-        if (ctx) {
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: {{ labels|safe }},
-                    datasets: [{
-                        data: {{ temps|safe }},
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 4,
-                        pointRadius: 2,
-                        pointBackgroundColor: '#3b82f6'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { display: false },
-                        x: { grid: { display: false }, ticks: { color: '#64748b', maxRotation: 0 } }
-                    }
+        // Chart Configuration
+        {% if data %}
+        new Chart(document.getElementById('tempChart'), {
+            type: 'line',
+            data: {
+                labels: {{ labels|safe }},
+                datasets: [{
+                    label: 'Hourly Temp',
+                    data: {{ temps|safe }},
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { display: false },
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 } } }
                 }
-            });
-        }
+            }
+        });
+        {% endif %}
 
-        // Theme Toggle Logic
+        // Theme Switcher
         function toggleTheme() {
             const html = document.getElementById('theme-tag');
             const icon = document.getElementById('theme-icon');
