@@ -1,49 +1,78 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en" id="theme-tag"> <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather App</title>
+    <title>Modern Weather App</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        // Tailwind configuration for dark mode
+        tailwind.config = { darkMode: 'class' }
+    </script>
 </head>
-<body class="bg-slate-900 text-white min-h-screen flex items-center justify-center">
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-white min-h-screen transition-colors duration-500">
 
-    <div class="max-w-md w-full p-6 bg-slate-800 rounded-3xl shadow-2xl border border-slate-700">
-        <h1 class="text-3xl font-bold text-center mb-6">🌤️ Weather App</h1>
-        
+    <div class="max-w-2xl mx-auto p-4">
+        <div class="flex justify-between items-center py-6">
+            <h1 class="text-2xl font-bold">🌤️ WeatherPro</h1>
+            <button onclick="toggleTheme()" class="p-2 bg-slate-200 dark:bg-slate-800 rounded-full text-xl">
+                <span id="theme-icon">🌙</span>
+            </button>
+        </div>
+
         <form method="POST" class="flex gap-2 mb-8">
-            <input type="text" name="city" placeholder="Enter city name..." 
-                   class="flex-1 p-3 rounded-xl bg-slate-700 border-none focus:ring-2 focus:ring-blue-500 outline-none">
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-xl font-bold transition">Search</button>
+            <input type="text" name="city" placeholder="Search city..." 
+                   class="flex-1 p-4 rounded-2xl bg-white dark:bg-slate-800 shadow-lg outline-none border-2 border-transparent focus:border-blue-500 transition">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-bold shadow-lg transition">Search</button>
         </form>
 
         {% if data %}
-        <div class="text-center">
-            <h2 class="text-2xl font-semibold">{{ data.location.name }}, {{ data.location.country }}</h2>
-            <p class="text-slate-400">{{ data.location.localtime }}</p>
+        <div class="bg-white dark:bg-slate-800 p-8 rounded-[2rem] shadow-xl text-center mb-6">
+            <h2 class="text-3xl font-bold">{{ data.location.name }}</h2>
+            <p class="text-slate-500">{{ data.location.country }}</p>
             
-            <div class="my-6">
-                <img src="{{ data.current.condition.icon }}" alt="icon" class="w-24 h-24 mx-auto">
-                <h3 class="text-5xl font-black">{{ data.current.temp_c }}°C</h3>
-                <p class="text-xl text-blue-400 mt-2">{{ data.current.condition.text }}</p>
+            <div class="flex items-center justify-center my-4">
+                <img src="{{ data.current.condition.icon }}" class="w-24 h-24">
+                <span class="text-7xl font-black">{{ data.current.temp_c }}°</span>
             </div>
-
-            <div class="grid grid-cols-2 gap-4 mt-6">
-                <div class="bg-slate-700 p-3 rounded-2xl">
-                    <p class="text-xs text-slate-400">HUMIDITY</p>
-                    <p class="font-bold">{{ data.current.humidity }}%</p>
-                </div>
-                <div class="bg-slate-700 p-3 rounded-2xl">
-                    <p class="text-xs text-slate-400">WIND</p>
-                    <p class="font-bold">{{ data.current.wind_kph }} km/h</p>
-                </div>
-            </div>
+            <p class="text-blue-500 font-medium text-xl">{{ data.current.condition.text }}</p>
         </div>
-        {% elif data == None and request.method == 'POST' %}
-            <p class="text-red-400 text-center">❌ City not found. Try again!</p>
+
+        <h3 class="text-xl font-bold mb-4 ml-2">Upcoming 3 Days</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {% for day in data.forecast.forecastday %}
+            <div class="bg-white/50 dark:bg-slate-800/50 backdrop-blur p-6 rounded-3xl border border-slate-200 dark:border-slate-700 text-center">
+                <p class="font-bold text-slate-500">{{ day.date }}</p>
+                <img src="{{ day.day.condition.icon }}" class="w-16 h-16 mx-auto">
+                <p class="text-2xl font-black">{{ day.day.avgtemp_c }}°C</p>
+                <p class="text-sm text-blue-500">{{ day.day.condition.text }}</p>
+            </div>
+            {% endfor %}
+        </div>
         {% endif %}
     </div>
 
+    <script>
+        // Light/Dark Mode Logic
+        function toggleTheme() {
+            const html = document.getElementById('theme-tag');
+            const icon = document.getElementById('theme-icon');
+            
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.innerText = '🌙';
+                localStorage.theme = 'light';
+            } else {
+                html.classList.add('dark');
+                icon.innerText = '☀️';
+                localStorage.theme = 'dark';
+            }
+        }
+
+        // Page එක load වෙද්දී කලින් තිබුණ theme එක apply කිරීම
+        if (localStorage.theme === 'dark') {
+            document.getElementById('theme-tag').classList.add('dark');
+            document.getElementById('theme-icon').innerText = '☀️';
+        }
+    </script>
 </body>
 </html>
