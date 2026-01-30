@@ -1,62 +1,118 @@
-<!DOCTYPE html>
-<html lang="en" id="theme-tag"> <head>
+﻿<!DOCTYPE html>
+<html lang="en" id="theme-tag">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Weather App</title>
+    <title>Weather Dashboard Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        // Tailwind configuration for dark mode
-        tailwind.config = { darkMode: 'class' }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <script>tailwind.config = { darkMode: 'class' }</script>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-white min-h-screen transition-colors duration-500">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-500">
 
-    <div class="max-w-2xl mx-auto p-4">
-        <div class="flex justify-between items-center py-6">
-            <h1 class="text-2xl font-bold">🌤️ WeatherPro</h1>
-            <button onclick="toggleTheme()" class="p-2 bg-slate-200 dark:bg-slate-800 rounded-full text-xl">
+    <div class="max-w-5xl mx-auto p-4 md:p-10">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-tight">Weather<span class="text-blue-600">Pro</span></h1>
+                <p class="text-slate-500 text-sm">Real-time Weather Analytics</p>
+            </div>
+            <button onclick="toggleTheme()" class="p-3 bg-white dark:bg-slate-800 shadow-md rounded-2xl text-xl">
                 <span id="theme-icon">🌙</span>
             </button>
         </div>
 
-        <form method="POST" class="flex gap-2 mb-8">
-            <input type="text" name="city" placeholder="Search city..." 
-                   class="flex-1 p-4 rounded-2xl bg-white dark:bg-slate-800 shadow-lg outline-none border-2 border-transparent focus:border-blue-500 transition">
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-bold shadow-lg transition">Search</button>
-        </form>
-
-        {% if data %}
-        <div class="bg-white dark:bg-slate-800 p-8 rounded-[2rem] shadow-xl text-center mb-6">
-            <h2 class="text-3xl font-bold">{{ data.location.name }}</h2>
-            <p class="text-slate-500">{{ data.location.country }}</p>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            <div class="flex items-center justify-center my-4">
-                <img src="{{ data.current.condition.icon }}" class="w-24 h-24">
-                <span class="text-7xl font-black">{{ data.current.temp_c }}°</span>
-            </div>
-            <p class="text-blue-500 font-medium text-xl">{{ data.current.condition.text }}</p>
-        </div>
+            <div class="lg:col-span-1 space-y-6">
+                <form method="POST" class="relative">
+                    <input type="text" name="city" placeholder="Enter city..." required
+                           class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 shadow-xl outline-none border-2 border-transparent focus:border-blue-500">
+                    <button type="submit" class="absolute right-2 top-2 bg-blue-600 text-white p-2 px-4 rounded-xl font-bold">Search</button>
+                </form>
 
-        <h3 class="text-xl font-bold mb-4 ml-2">Upcoming 3 Days</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {% for day in data.forecast.forecastday %}
-            <div class="bg-white/50 dark:bg-slate-800/50 backdrop-blur p-6 rounded-3xl border border-slate-200 dark:border-slate-700 text-center">
-                <p class="font-bold text-slate-500">{{ day.date }}</p>
-                <img src="{{ day.day.condition.icon }}" class="w-16 h-16 mx-auto">
-                <p class="text-2xl font-black">{{ day.day.avgtemp_c }}°C</p>
-                <p class="text-sm text-blue-500">{{ day.day.condition.text }}</p>
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-[2rem] shadow-lg">
+                    <h3 class="font-bold mb-4 flex items-center gap-2">🕒 Recent Searches</h3>
+                    <div class="flex flex-wrap gap-2">
+                        {% for city in history %}
+                        <form method="POST" class="inline">
+                            <input type="hidden" name="city" value="{{ city }}">
+                            <button type="submit" class="text-xs bg-slate-100 dark:bg-slate-700 px-3 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900 transition">
+                                {{ city }}
+                            </button>
+                        </form>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
-            {% endfor %}
+
+            <div class="lg:col-span-2 space-y-6">
+                {% if data %}
+                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-8 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden">
+                    <div class="relative z-10 flex justify-between items-start">
+                        <div>
+                            <h2 class="text-4xl font-black">{{ data.location.name }}</h2>
+                            <p class="opacity-80">{{ data.location.region }}, {{ data.location.country }}</p>
+                            <h3 class="text-8xl font-black mt-4">{{ data.current.temp_c }}°</h3>
+                        </div>
+                        <div class="text-right">
+                            <img src="{{ data.current.condition.icon }}" class="w-32 h-32 -mt-4">
+                            <p class="text-xl font-bold">{{ data.current.condition.text }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-[2rem] shadow-lg">
+                    <h3 class="font-bold mb-4">📈 Hourly Temperature (°C)</h3>
+                    <canvas id="tempChart" height="150"></canvas>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    {% for day in data.forecast.forecastday %}
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl text-center shadow">
+                        <p class="text-xs text-slate-500 font-bold uppercase">{{ day.date[5:] }}</p>
+                        <img src="{{ day.day.condition.icon }}" class="w-12 h-12 mx-auto">
+                        <p class="text-xl font-black">{{ day.day.avgtemp_c }}°</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
         </div>
-        {% endif %}
     </div>
 
     <script>
-        // Light/Dark Mode Logic
+        // Chart.js Configuration
+        const ctx = document.getElementById('tempChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ labels|safe }},
+                    datasets: [{
+                        label: 'Temperature',
+                        data: {{ temps|safe }},
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { display: false },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+        }
+
+        // Theme Toggle
         function toggleTheme() {
             const html = document.getElementById('theme-tag');
             const icon = document.getElementById('theme-icon');
-            
             if (html.classList.contains('dark')) {
                 html.classList.remove('dark');
                 icon.innerText = '🌙';
@@ -67,8 +123,6 @@
                 localStorage.theme = 'dark';
             }
         }
-
-        // Page එක load වෙද්දී කලින් තිබුණ theme එක apply කිරීම
         if (localStorage.theme === 'dark') {
             document.getElementById('theme-tag').classList.add('dark');
             document.getElementById('theme-icon').innerText = '☀️';
