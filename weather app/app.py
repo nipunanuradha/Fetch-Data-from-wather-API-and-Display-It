@@ -1,3 +1,5 @@
+import smtplib
+from email.mime.text import MIMEText
 from flask import Flask, render_template, request, session
 from weather_logic import WeatherFetcher
 import secrets
@@ -5,40 +7,59 @@ import secrets
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
 
-# ඔයාගේ API Key එක මෙතනට දාන්න
-fetcher = WeatherFetcher("1c79708b20d740c097d145309263001")
+# Configurations
+API_KEY = "1c79708b20d740c097d145309263001"
+EMAIL_ADDRESS = "kasunlankalk48@gmail.com"  # sender Email 
+EMAIL_PASSWORD = "qzvi vdxx rymg faqz"    # Sender Gmail App Password 
+fetcher = WeatherFetcher(API_KEY)
+
+def send_alert_email(city, condition, user_email):
+    msg = MIMEText(f"⚠️ Warning: Bad weather detected in {city}!\nCondition: {condition}")
+    msg['Subject'] = f"Weather Alert: {city}"
+    msg['From'] = EMAIL_ADDRESS
+    msg['To'] = user_email
+
+    try:
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+            smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            smtp.send_message(msg)
+        return True
+    except Exception as e:
+        print(f"Email Error: {e}")
+        return False
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     weather_data = None
-    hourly_labels = []
-    hourly_temps = []
-    
-    if 'history' not in session:
-        session['history'] = []
+    hourly_labels, hourly_temps = [], []
+    alert_status = False
+
+    if 'history' not in session: session['history'] = []
 
     if request.method == 'POST':
         city = request.form.get('city')
-        if city:
-            weather_data = fetcher.fetch_weather(city)
-            if weather_data:
-                city_name = weather_data['location']['name']
-                # History එක update කිරීම
-                if city_name not in session['history']:
-                    new_history = [city_name] + session['history']
-                    session['history'] = new_history[:5]
-                    session.modified = True
-                
-                # Chart දත්ත
-                for hour in weather_data['forecast']['forecastday'][0]['hour']:
-                    hourly_labels.append(hour['time'].split(' ')[1])
-                    hourly_temps.append(hour['temp_c'])
+        user_email = request.form.get('email') # User email
+        
+        weather_data = fetcher.fetch_weather(city)
+        if weather_data:
+            # History update
+            if weather_data['location']['name'] not in session['history']:
+                session['history'] = [weather_data['location']['name']] + session['history'][:4]
+                session.modified = True
 
-    return render_template('index.html', 
-                           data=weather_data, 
-                           history=session['history'],
-                           labels=hourly_labels, 
-                           temps=hourly_temps)
+            # Bad weather check (Rain > 70% or UV > 8)
+            rain_chance = weather_data['forecast']['forecastday'][0]['day']['daily_chance_of_rain']
+            if rain_chance > 70 and user_email:
+                send_alert_email(city, f"High chance of rain ({rain_chance}%)", user_email)
+                alert_status = True
+
+            # Chart data
+            for hour in weather_data['forecast']['forecastday'][0]['hour']:
+                hourly_labels.append(hour['time'].split(' ')[1])
+                hourly_temps.append(hour['temp_c'])
+
+    return render_template('index.html', data=weather_data, history=session['history'], 
+                           labels=hourly_labels, temps=hourly_temps, alert=alert_status)
 
 if __name__ == '__main__':
     app.run(debug=True)

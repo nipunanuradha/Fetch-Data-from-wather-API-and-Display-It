@@ -3,42 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WeatherPro Dashboard</title>
+    <title>WeatherPro Elite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>tailwind.config = { darkMode: 'class' }</script>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-500">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-all duration-500">
 
     <div class="max-w-7xl mx-auto p-4 md:p-8">
-        <div class="flex justify-between items-center mb-8 bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm">
-            <h1 class="text-2xl font-black text-blue-600">WeatherPro.io</h1>
+        <div class="flex justify-between items-center mb-8 bg-white dark:bg-slate-900 p-5 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800">
+            <h1 class="text-2xl font-black text-blue-600 tracking-tighter">WeatherPro <span class="text-slate-400 font-light">v2.0</span></h1>
             <div class="flex items-center gap-4">
-                <button onclick="toggleTheme()" class="p-2 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                <button onclick="requestNotifyPermission()" class="text-xs font-bold text-blue-500 hover:underline">🚨Enable Desktop Alerts🚨</button>
+                <button onclick="toggleTheme()" class="p-3 bg-slate-100 dark:bg-slate-800 rounded-2xl">
                     <span id="theme-icon">🌙</span>
                 </button>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-3 space-y-6">
-                <form method="POST" class="relative">
-                    <input type="text" name="city" placeholder="Search City..." required
-                           class="w-full p-4 rounded-2xl bg-white dark:bg-slate-900 shadow-lg outline-none border-2 border-transparent focus:border-blue-500 transition">
-                    <button type="submit" class="absolute right-2 top-2 bg-blue-600 text-white px-4 py-2 rounded-xl font-bold">Find</button>
+                <form method="POST" class="space-y-4">
+                    <input type="text" name="city" placeholder="City Name" required class="w-full p-4 rounded-2xl bg-white dark:bg-slate-900 shadow-lg outline-none border-2 border-transparent focus:border-blue-500">
+                    <input type="email" name="email" placeholder="Email for Alerts (Optional)" class="w-full p-4 rounded-2xl bg-white dark:bg-slate-900 shadow-lg outline-none border-2 border-transparent focus:border-blue-500">
+                    <button type="submit" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold shadow-blue-500/20 shadow-lg hover:bg-blue-700 transition">Fetch Analysis</button>
                 </form>
 
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-lg">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Recent Searches</h3>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl">
+                    <h3 class="text-xs font-bold text-slate-400 mb-4 uppercase">Recent Searches</h3>
                     <div class="space-y-2">
                         {% for city in history %}
-                        <form method="POST">
-                            <input type="hidden" name="city" value="{{ city }}">
-                            <button type="submit" class="w-full text-left p-3 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/30 transition border border-transparent hover:border-blue-200">
-                                📍 {{ city }}
-                            </button>
-                        </form>
+                        <form method="POST"><input type="hidden" name="city" value="{{ city }}"><button type="submit" class="w-full text-left p-3 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/30 transition text-sm font-semibold">📍 {{ city }}</button></form>
                         {% endfor %}
                     </div>
                 </div>
@@ -47,72 +42,33 @@
             <div class="lg:col-span-9 space-y-6">
                 {% if data %}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-8 rounded-[2.5rem] text-white shadow-2xl overflow-hidden relative">
-                        <div class="relative z-10">
-                            <h2 class="text-3xl font-bold">{{ data.location.name }}</h2>
-                            <p class="opacity-70">{{ data.location.country }}</p>
-                            <div class="flex items-center gap-4 mt-4">
-                                <h3 class="text-7xl font-black">{{ data.current.temp_c }}°</h3>
-                                <img src="{{ data.current.condition.icon }}" class="w-20 h-20">
-                            </div>
-                            <p class="mt-2 font-medium">Condition: {{ data.current.condition.text }}</p>
+                    <div class="bg-gradient-to-br from-indigo-600 to-blue-700 p-8 rounded-[3rem] text-white shadow-2xl relative overflow-hidden">
+                        <h2 class="text-4xl font-black">{{ data.location.name }}</h2>
+                        <div class="flex items-center gap-6 mt-6">
+                            <h3 class="text-8xl font-black">{{ data.current.temp_c }}°</h3>
+                            <img src="{{ data.current.condition.icon }}" class="w-24 h-24">
                         </div>
+                        <p class="text-xl opacity-90 font-medium mt-4">{{ data.current.condition.text }}</p>
                     </div>
 
-                    <div class="rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800 h-64 md:h-auto">
-                        <iframe width="100%" height="100%" frameborder="0" style="border:0"
-                                src="https://www.google.com/maps?q={{ data.location.name }}+{{ data.location.country }}&output=embed">
-                        </iframe>
+                    <div class="rounded-[3rem] overflow-hidden shadow-2xl h-80 border-4 border-white dark:border-slate-800">
+                        <iframe width="100%" height="100%" frameborder="0" src="https://www.google.com/maps?q={{ data.location.name }}+{{ data.location.country }}&output=embed"></iframe>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-lg">
-                    <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
-                        🍃 Air Quality Index (Detailed)
-                        <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-md">Live Data</span>
-                    </h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-center">
-                            <p class="text-[10px] font-bold text-slate-400">CO</p>
-                            <p class="text-sm font-black">{{ data.current.air_quality.co|round(1) }}</p>
-                        </div>
-                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-center">
-                            <p class="text-[10px] font-bold text-slate-400">NO₂</p>
-                            <p class="text-sm font-black">{{ data.current.air_quality.no2|round(1) }}</p>
-                        </div>
-                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-center">
-                            <p class="text-[10px] font-bold text-slate-400">O₃</p>
-                            <p class="text-sm font-black">{{ data.current.air_quality.o3|round(1) }}</p>
-                        </div>
-                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-center border-b-2 border-orange-400">
-                            <p class="text-[10px] font-bold text-slate-400">PM₂.₅</p>
-                            <p class="text-sm font-black">{{ data.current.air_quality.pm2_5|round(1) }}</p>
-                        </div>
-                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-center border-b-2 border-red-400">
-                            <p class="text-[10px] font-bold text-slate-400">PM₁₀</p>
-                            <p class="text-sm font-black">{{ data.current.air_quality.pm10|round(1) }}</p>
-                        </div>
-                        <div class="p-4 bg-blue-600 text-white rounded-2xl text-center">
-                            <p class="text-[10px] font-bold opacity-70">US EPA</p>
-                            <p class="text-sm font-black">{{ data.current.air_quality['us-epa-index'] }}</p>
-                        </div>
+                <div class="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-xl">
+                    <h3 class="font-bold mb-6 text-slate-400 uppercase text-xs">Air Quality Metrics</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-center"><p class="text-[10px] text-slate-500 font-bold uppercase">CO</p><p class="text-lg font-black">{{ data.current.air_quality.co|round(1) }}</p></div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-center"><p class="text-[10px] text-slate-500 font-bold uppercase">O3</p><p class="text-lg font-black">{{ data.current.air_quality.o3|round(1) }}</p></div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-center"><p class="text-[10px] text-slate-500 font-bold uppercase">NO2</p><p class="text-lg font-black">{{ data.current.air_quality.no2|round(1) }}</p></div>
+                        <div class="p-4 bg-blue-600 text-white rounded-2xl text-center"><p class="text-[10px] opacity-70 font-bold uppercase">EPA Index</p><p class="text-lg font-black">{{ data.current.air_quality['us-epa-index'] }}</p></div>
+                        <div class="p-4 bg-orange-500 text-white rounded-2xl text-center"><p class="text-[10px] opacity-70 font-bold uppercase">Rain Chance</p><p class="text-lg font-black">{{ data.forecast.forecastday[0].day.daily_chance_of_rain }}%</p></div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-lg">
-                        <canvas id="tempChart" height="180"></canvas>
-                    </div>
-                    <div class="grid grid-cols-3 gap-4">
-                        {% for day in data.forecast.forecastday %}
-                        <div class="bg-white dark:bg-slate-900 p-4 rounded-[2rem] text-center shadow-lg border border-transparent hover:border-blue-500 transition cursor-default">
-                            <p class="text-[10px] font-bold text-slate-400">{{ day.date[5:] }}</p>
-                            <img src="{{ day.day.condition.icon }}" class="mx-auto w-12 h-12">
-                            <p class="text-lg font-black">{{ day.day.avgtemp_c }}°</p>
-                            <p class="text-[10px] text-blue-500 font-bold">{{ day.day.daily_chance_of_rain }}% Rain</p>
-                        </div>
-                        {% endfor %}
-                    </div>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-[3rem] shadow-xl">
+                    <canvas id="tempChart" height="120"></canvas>
                 </div>
                 {% endif %}
             </div>
@@ -120,52 +76,44 @@
     </div>
 
     <script>
-        // Chart Configuration
+        // Desktop Notification Logic
+        function requestNotifyPermission() {
+            Notification.requestPermission();
+        }
+
         {% if data %}
-        new Chart(document.getElementById('tempChart'), {
-            type: 'line',
-            data: {
-                labels: {{ labels|safe }},
-                datasets: [{
-                    label: 'Hourly Temp',
-                    data: {{ temps|safe }},
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    fill: true,
-                    tension: 0.4,
-                    borderWidth: 3,
-                    pointRadius: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { display: false },
-                    x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 } } }
-                }
+            const rainChance = {{ data.forecast.forecastday[0].day.daily_chance_of_rain }};
+            if (rainChance > 70 && Notification.permission === "granted") {
+                new Notification("Weather Alert! ⚠️", {
+                    body: "There is a " + rainChance + "% chance of rain today in {{ data.location.name }}.",
+                    icon: "{{ data.current.condition.icon }}"
+                });
             }
-        });
+
+            // Chart
+            new Chart(document.getElementById('tempChart'), {
+                type: 'line',
+                data: {
+                    labels: {{ labels|safe }},
+                    datasets: [{
+                        label: 'Temperature',
+                        data: {{ temps|safe }},
+                        borderColor: '#3b82f6',
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)'
+                    }]
+                },
+                options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+            });
         {% endif %}
 
-        // Theme Switcher
         function toggleTheme() {
-            const html = document.getElementById('theme-tag');
-            const icon = document.getElementById('theme-icon');
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                icon.innerText = '🌙';
-                localStorage.theme = 'light';
-            } else {
-                html.classList.add('dark');
-                icon.innerText = '☀️';
-                localStorage.theme = 'dark';
-            }
+            const h = document.getElementById('theme-tag');
+            h.classList.toggle('dark');
+            localStorage.theme = h.classList.contains('dark') ? 'dark' : 'light';
         }
-        if (localStorage.theme === 'dark') {
-            document.getElementById('theme-tag').classList.add('dark');
-            document.getElementById('theme-icon').innerText = '☀️';
-        }
+        if (localStorage.theme === 'dark') document.getElementById('theme-tag').classList.add('dark');
     </script>
 </body>
 </html>
