@@ -1,6 +1,6 @@
 """
 Weather Data Fetcher
-This program fetches weather data from OpenWeatherMap API and displays it in a user-friendly format.
+This program fetches weather data from WeatherAPI.com and displays it in a user-friendly format.
 """
 
 import requests
@@ -11,7 +11,8 @@ class WeatherFetcher:
     def __init__(self, api_key):
         """Initialize the weather fetcher with API key"""
         self.api_key = api_key
-        self.base_url = "http://api.weatherapi.com/v1/current.json?key=1c79708b20d740c097d145309263001&q=London&aqi=no"
+        # Fixed: Using correct WeatherAPI.com base URL
+        self.base_url = "http://api.weatherapi.com/v1/current.json"
     
     def fetch_weather(self, city):
         """
@@ -24,11 +25,11 @@ class WeatherFetcher:
             dict: Weather data or None if request fails
         """
         try:
-            # Parameters for API request
+            # Fixed: Correct parameters for WeatherAPI.com
             params = {
+                'key': self.api_key,  # Changed from 'appid' to 'key'
                 'q': city,
-                'appid': self.api_key,
-                'units': 'metric'  # Use Celsius
+                'aqi': 'no'  # Air quality index not needed
             }
             
             # Make the API request
@@ -71,27 +72,42 @@ class WeatherFetcher:
         if not data:
             return
         
-        # Extract relevant information
-        city = data['name']
-        country = data['sys']['country']
-        temp = data['main']['temp']
-        feels_like = data['main']['feels_like']
-        humidity = data['main']['humidity']
-        pressure = data['main']['pressure']
-        weather_desc = data['weather'][0]['description'].capitalize()
-        wind_speed = data['wind']['speed']
+        # Fixed: Extract data from WeatherAPI.com response structure
+        # Location data
+        city = data['location']['name']
+        region = data['location']['region']
+        country = data['location']['country']
+        
+        # Current weather data
+        temp_c = data['current']['temp_c']
+        temp_f = data['current']['temp_f']
+        feels_like_c = data['current']['feelslike_c']
+        feels_like_f = data['current']['feelslike_f']
+        humidity = data['current']['humidity']
+        pressure_mb = data['current']['pressure_mb']
+        weather_desc = data['current']['condition']['text']
+        wind_kph = data['current']['wind_kph']
+        wind_mph = data['current']['wind_mph']
+        wind_dir = data['current']['wind_dir']
+        cloud = data['current']['cloud']
+        uv = data['current']['uv']
+        visibility = data['current']['vis_km']
         
         # Display in a formatted way
-        print("\n" + "="*50)
-        print(f"📍 WEATHER REPORT FOR {city.upper()}, {country}")
-        print("="*50)
-        print(f"\n🌡️  Temperature: {temp}°C")
-        print(f"🤔 Feels Like: {feels_like}°C")
+        print("\n" + "="*60)
+        print(f"📍 WEATHER REPORT FOR {city.upper()}")
+        print(f"   {region}, {country}")
+        print("="*60)
+        print(f"\n🌡️  Temperature: {temp_c}°C ({temp_f}°F)")
+        print(f"🤔 Feels Like: {feels_like_c}°C ({feels_like_f}°F)")
         print(f"☁️  Conditions: {weather_desc}")
         print(f"💧 Humidity: {humidity}%")
-        print(f"🎚️  Pressure: {pressure} hPa")
-        print(f"💨 Wind Speed: {wind_speed} m/s")
-        print("\n" + "="*50)
+        print(f"☁️  Cloud Cover: {cloud}%")
+        print(f"🎚️  Pressure: {pressure_mb} mb")
+        print(f"💨 Wind: {wind_kph} km/h ({wind_mph} mph) {wind_dir}")
+        print(f"👁️  Visibility: {visibility} km")
+        print(f"☀️  UV Index: {uv}")
+        print("\n" + "="*60)
     
     def save_to_file(self, data, filename="weather_data.json"):
         """
@@ -112,20 +128,12 @@ class WeatherFetcher:
 def main():
     """Main function to run the weather fetcher"""
     
-    print("="*50)
+    print("="*60)
     print("🌤️  WEATHER DATA FETCHER")
-    print("="*50)
+    print("="*60)
     
-    # API Key (You need to get your own from openweathermap.org)
-    # Sign up at: https://openweathermap.org/api
+    # Your WeatherAPI.com API Key
     api_key = "1c79708b20d740c097d145309263001"
-    
-    if api_key == "1c79708b20d740c097d145309263001":
-        #print("\n⚠️  WARNING: Please replace 'e89f55408ac4f980a093d7dbf1fba991' with your actual API key")
-        #print("📝 Get a free API key at: https://openweathermap.org/api")
-        print("\nFor demonstration, using a demo mode...\n")
-        # You can continue with demo mode or exit
-        return
     
     # Create weather fetcher instance
     fetcher = WeatherFetcher(api_key)

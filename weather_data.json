@@ -1,0 +1,51 @@
+{
+    "location": {
+        "name": "Kandy",
+        "region": "Central",
+        "country": "Sri Lanka",
+        "lat": 7.2955,
+        "lon": 80.6356,
+        "tz_id": "Asia/Colombo",
+        "localtime_epoch": 1769789285,
+        "localtime": "2026-01-30 21:38"
+    },
+    "current": {
+        "last_updated_epoch": 1769788800,
+        "last_updated": "2026-01-30 21:30",
+        "temp_c": 19.5,
+        "temp_f": 67.1,
+        "is_day": 0,
+        "condition": {
+            "text": "Fog",
+            "icon": "//cdn.weatherapi.com/weather/64x64/night/248.png",
+            "code": 1135
+        },
+        "wind_mph": 4.3,
+        "wind_kph": 6.8,
+        "wind_degree": 90,
+        "wind_dir": "E",
+        "pressure_mb": 1016.0,
+        "pressure_in": 30.01,
+        "precip_mm": 0.01,
+        "precip_in": 0.0,
+        "humidity": 97,
+        "cloud": 100,
+        "feelslike_c": 19.5,
+        "feelslike_f": 67.1,
+        "windchill_c": 19.5,
+        "windchill_f": 67.1,
+        "heatindex_c": 19.5,
+        "heatindex_f": 67.1,
+        "dewpoint_c": 19.0,
+        "dewpoint_f": 66.3,
+        "vis_km": 0.0,
+        "vis_miles": 0.0,
+        "uv": 0.0,
+        "gust_mph": 7.8,
+        "gust_kph": 12.6,
+        "short_rad": 0,
+        "diff_rad": 0,
+        "dni": 0,
+        "gti": 0
+    }
+}
