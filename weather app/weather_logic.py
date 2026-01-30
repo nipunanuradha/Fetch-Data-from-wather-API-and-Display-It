@@ -6,7 +6,7 @@ class WeatherFetcher:
         self.base_url = "http://api.weatherapi.com/v1/forecast.json"
 
     def fetch_weather(self, city):
-        # දින 5ක දත්ත සහ AQI දත්ත ලබා ගැනීමට පරාමිතීන් සකසයි
+        # add 5-day forecast and air quality
         params = {
             'key': self.api_key, 
             'q': city, 
