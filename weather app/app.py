@@ -3,7 +3,7 @@ from weather_logic import WeatherFetcher
 import secrets
 
 app = Flask(__name__)
-app.secret_key = secrets.token_hex(16) # Sneed secret key for session management
+app.secret_key = secrets.token_hex(16)
 
 fetcher = WeatherFetcher("1c79708b20d740c097d145309263001")
 
@@ -13,7 +13,6 @@ def index():
     hourly_labels = []
     hourly_temps = []
     
-    # initialize search history in session
     if 'history' not in session:
         session['history'] = []
 
@@ -21,20 +20,15 @@ def index():
         city = request.form.get('city')
         if city:
             weather_data = fetcher.fetch_weather(city)
-            
             if weather_data:
-                #  Search History 
                 city_name = weather_data['location']['name']
                 if city_name not in session['history']:
-                    # maintain only last 5 searches
                     new_history = [city_name] + session['history']
                     session['history'] = new_history[:5]
                     session.modified = True
                 
-                # 2. get data for hourly chart
-                # first day's hourly data in 24 hours
+                # Chart එකට පැයෙන් පැයට දත්ත ගැනීම
                 for hour in weather_data['forecast']['forecastday'][0]['hour']:
-                    # show the time in HH:MM format
                     time_label = hour['time'].split(' ')[1]
                     hourly_labels.append(time_label)
                     hourly_temps.append(hour['temp_c'])
