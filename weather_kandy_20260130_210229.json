@@ -1,0 +1,33 @@
+{
+    "name": "Kandy",
+    "sys": {
+        "country": "LK"
+    },
+    "coord": {
+        "lon": 80.63,
+        "lat": 7.29
+    },
+    "main": {
+        "temp": 24.3,
+        "feels_like": 25.8,
+        "temp_min": 22.1,
+        "temp_max": 26.5,
+        "humidity": 82,
+        "pressure": 1012
+    },
+    "weather": [
+        {
+            "main": "Rain",
+            "description": "light rain",
+            "icon": "10d"
+        }
+    ],
+    "wind": {
+        "speed": 3.2,
+        "deg": 180
+    },
+    "clouds": {
+        "all": 75
+    },
+    "visibility": 8000
+}

@@ -1,0 +1,33 @@
+{
+    "name": "Colombo",
+    "sys": {
+        "country": "LK"
+    },
+    "coord": {
+        "lon": 79.85,
+        "lat": 6.93
+    },
+    "main": {
+        "temp": 28.5,
+        "feels_like": 32.1,
+        "temp_min": 26.8,
+        "temp_max": 30.2,
+        "humidity": 78,
+        "pressure": 1010
+    },
+    "weather": [
+        {
+            "main": "Clouds",
+            "description": "partly cloudy",
+            "icon": "02d"
+        }
+    ],
+    "wind": {
+        "speed": 4.5,
+        "deg": 220
+    },
+    "clouds": {
+        "all": 40
+    },
+    "visibility": 10000
+}
