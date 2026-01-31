@@ -6,17 +6,10 @@ class WeatherFetcher:
         self.base_url = "http://api.weatherapi.com/v1/forecast.json"
 
     def fetch_weather(self, city):
-        # add 5-day forecast and air quality
-        params = {
-            'key': self.api_key, 
-            'q': city, 
-            'days': 5, 
-            'aqi': 'yes'
-        }
+        params = {'key': self.api_key, 'q': city, 'days': 5, 'aqi': 'yes'}
         try:
             response = requests.get(self.base_url, params=params)
             response.raise_for_status()
             return response.json()
-        except Exception as e:
-            print(f"Logic Error: {e}")
+        except Exception:
             return None
