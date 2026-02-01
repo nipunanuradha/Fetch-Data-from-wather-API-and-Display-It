@@ -6,6 +6,8 @@ class WeatherFetcher:
         self.base_url = "http://api.weatherapi.com/v1/forecast.json"
 
     def fetch_weather(self, city):
+        # WeatherAPI දැනට සිංහල භාෂාව සෘජුවම ලබා නොදෙන බැවින්, 
+        # අපි දත්ත ලබාගෙන UI එක හරහා පරිවර්තනය කරමු.
         params = {'key': self.api_key, 'q': city, 'days': 5, 'aqi': 'yes'}
         try:
             response = requests.get(self.base_url, params=params)

@@ -8,9 +8,8 @@ import secrets
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
 
-# Config
+# CONFIGURATIONS
 API_KEY = "1c79708b20d740c097d145309263001"
-# Alerts Config (Replace with your actual credentials)
 EMAIL_ADDRESS = "your-email@gmail.com"
 EMAIL_PASSWORD = "your-app-password"
 TWILIO_SID = 'your_sid'
@@ -22,8 +21,8 @@ fetcher = WeatherFetcher(API_KEY)
 def send_alerts(city, condition, user_email, user_phone):
     if user_email:
         try:
-            msg = MIMEText(f"⚠️ Weather Alert for {city}: {condition}")
-            msg['Subject'] = "WeatherPro Alert"
+            msg = MIMEText(f"⚠️ Weather Alert: {condition} in {city}")
+            msg['Subject'] = "WeatherPro Elite Alert"
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
                 smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
                 smtp.send_message(msg)
@@ -53,7 +52,7 @@ def index():
                 session.modified = True
             
             rain = weather_data['forecast']['forecastday'][0]['day']['daily_chance_of_rain']
-            if rain > 70: send_alerts(name, f"High Rain Chance ({rain}%)", email, phone)
+            if rain > 70: send_alerts(name, f"High Rain Probability ({rain}%)", email, phone)
 
             for hour in weather_data['forecast']['forecastday'][0]['hour']:
                 hourly_labels.append(hour['time'].split(' ')[1])
