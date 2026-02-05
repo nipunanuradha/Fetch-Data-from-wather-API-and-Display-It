@@ -46,11 +46,11 @@
                 <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800">
                     <h3 id="plannerTitle" class="text-[10px] font-black text-blue-500 mb-4 uppercase tracking-widest italic">Weather-Smart Planner</h3>
                     <div class="space-y-3">
-                        <input type="text" id="eventTitle" placeholder="Event Name" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-xs border-none outline-none">
+                        <input type="text" id="eventTitle" placeholder="Event Name (e.g. Trip)" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-xs border-none outline-none">
                         <select id="eventDate" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-xs border-none outline-none">
                             {% if data %}
                                 {% for day in data.forecast.forecastday %}
-                                    <option value="{{ day.date }}">{{ day.date }}</option>
+                                    <option value="{{ day.date }}">{{ day.date }} (Rain: {{ day.day.daily_chance_of_rain }}%) </option>
                                 {% endfor %}
                             {% else %}<option disabled>Search first</option>{% endif %}
                         </select>
@@ -67,6 +67,15 @@
                         <div id="lkrOutput" class="text-center p-2 text-sm font-bold bg-blue-50 dark:bg-blue-900/20 rounded-xl text-blue-500">0.00 LKR</div>
                     </div>
                 </div>
+
+                       <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800">
+                    <h3 id="historyTitle" class="text-[10px] font-black text-slate-400 mb-4 uppercase tracking-widest">Recent Activity</h3>
+                    <div class="space-y-2">
+                        {% for city in history_list %}
+                        <form method="POST"><input type="hidden" name="city" value="{{ city }}"><button type="submit" class="w-full text-left p-3 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/30 transition text-sm font-semibold">📍 {{ city }}</button></form>
+                        {% endfor %}
+                    </div>
+                </div>
             </aside>
 
             <main class="lg:col-span-9 space-y-6">
@@ -76,13 +85,84 @@
                         <div>
                             <h2 class="text-2xl font-bold opacity-80 mb-2">{{ data.location.name }}, {{ data.location.country }}</h2>
                             <h3 class="text-8xl font-black tracking-tighter mb-4">{{ data.current.temp_c }}°C</h3>
-                            <p class="text-blue-100 text-sm italic">Feels like {{ data.current.feelslike_c }}°C</p>
+                             <div class="flex items-center justify-center md:justify-start gap-4">
+                                <span class="bg-white/20 px-4 py-1 rounded-full text-xs font-bold backdrop-blur">H: {{ data.forecast.forecastday[0].day.maxtemp_c }}° L: {{ data.forecast.forecastday[0].day.mintemp_c }}°</span>
+                                <span class="text-blue-100 text-sm">Feels like {{ data.current.feelslike_c }}°C</span>
+                            </div>
                         </div>
                         <div class="text-center">
                             <img src="{{ data.current.condition.icon }}" class="w-32 h-32 animate-pulse">
                             <p class="text-xl font-black uppercase tracking-widest">{{ data.current.condition.text }}</p>
                         </div>
                     </div>
+                    <div class="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+                </div>
+                {% endif %}
+
+                
+
+                {% if data %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="rounded-[3rem] overflow-hidden shadow-xl h-80 border-4 border-white dark:border-slate-800"><iframe width="100%" height="100%" src="https://embed.windy.com/embed2.html?lat={{ data.location.lat }}&lon={{ data.location.lon }}&zoom=5&overlay=satellite" frameborder="0"></iframe></div>
+                    <div class="rounded-[3rem] overflow-hidden shadow-xl h-80 border-4 border-white dark:border-slate-800"><iframe width="100%" height="100%" frameborder="0" src="https://www.google.com/maps?q={{ data.location.lat }},{{ data.location.lon }}&z=10&output=embed"></iframe></div>
+                </div>
+
+            <div class="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-2xl border dark:border-slate-800">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 id="envTitle" class="text-xs font-bold text-blue-500 uppercase tracking-widest">Environmental Intelligence</h3>
+                        <span class="text-[10px] bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full font-bold">Zone: {{ data.location.tz_id }}</span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                        <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-3xl text-center border-b-4 border-blue-500">
+                            <p class="text-[10px] font-bold text-slate-500 uppercase">Rain</p>
+                            <p class="text-xl font-black">{{ data.forecast.forecastday[0].day.daily_chance_of_rain }}%</p>
+                        </div>
+                        <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-3xl text-center border-b-4 border-green-500">
+                            <p class="text-[10px] font-bold text-slate-500 uppercase">AQI</p>
+                            <p class="text-xl font-black">{{ data.current.air_quality['us-epa-index'] }}</p>
+                        </div>
+                        <div class="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-3xl text-center border-b-4 border-orange-500">
+                            <p class="text-[10px] font-bold text-slate-500 uppercase">UV</p>
+                            <p class="text-xl font-black">{{ data.current.uv }}</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-3xl text-center">
+                            <p class="text-[10px] font-bold text-slate-500 uppercase">Humidity</p>
+                            <p class="text-xl font-black">{{ data.current.humidity }}%</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-3xl text-center">
+                            <p class="text-[10px] font-bold text-slate-500 uppercase">Pressure</p>
+                            <p class="text-xl font-black">{{ data.current.pressure_mb }}<span class="text-[8px] ml-1">mb</span></p>
+                        </div>
+                        <div class="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-3xl text-center border-b-4 border-purple-500">
+                            <p class="text-[10px] font-bold text-slate-500 uppercase">Visibility</p>
+                            <p class="text-xl font-black">{{ data.current.vis_km }}<span class="text-[8px] ml-1">KM</span></p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-6 pt-6 border-t dark:border-slate-800">
+                        <div class="text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">CO</p><p class="font-black">{{ data.current.air_quality.co|round(1) }}</p></div>
+                        <div class="text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">NO₂</p><p class="font-black">{{ data.current.air_quality.no2|round(1) }}</p></div>
+                        <div class="text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">O₃</p><p class="font-black">{{ data.current.air_quality.o3|round(1) }}</p></div>
+                        <div class="text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">SO₂</p><p class="font-black">{{ data.current.air_quality.so2|round(1) }}</p></div>
+                        <div class="text-center"><p class="text-[10px] font-bold text-orange-500 uppercase">PM 2.5</p><p class="font-black">{{ data.current.air_quality.pm2_5|round(1) }}</p></div>
+                        <div class="text-center"><p class="text-[10px] font-bold text-red-500 uppercase">PM 10</p><p class="font-black">{{ data.current.air_quality.pm10|round(1) }}</p></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-xl border dark:border-slate-800"><h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">7-Day History Trend</h3><canvas id="historyChart" height="150"></canvas></div>
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-xl border dark:border-slate-800"><h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">24-Hour Temp Variation</h3><canvas id="tempChart" height="150"></canvas></div>
+                </div>
+
+                <div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+                    {% for day in data.forecast.forecastday %}
+                    <div class="min-w-[150px] bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] text-center shadow-lg border border-transparent hover:border-blue-500 transition-all duration-300">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ day.date[5:] }}</p>
+                        <img src="{{ day.day.condition.icon }}" class="mx-auto w-12 h-12 my-2">
+                        <p class="text-xl font-black">{{ day.day.avgtemp_c|round(0) }}°C</p>
+                        <p class="text-[8px] font-bold text-blue-500">🌧️ {{ day.day.daily_chance_of_rain }}%</p>
+                    </div>
+                    {% endfor %}
                 </div>
                 {% endif %}
 
@@ -103,22 +183,6 @@
                         {% endfor %}
                     </div>
                 </div>
-
-                {% if data %}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="rounded-[3rem] overflow-hidden shadow-xl h-80 border-4 border-white dark:border-slate-800"><iframe width="100%" height="100%" src="https://embed.windy.com/embed2.html?lat={{ data.location.lat }}&lon={{ data.location.lon }}&zoom=5&overlay=satellite" frameborder="0"></iframe></div>
-                    <div class="rounded-[3rem] overflow-hidden shadow-xl h-80 border-4 border-white dark:border-slate-800"><iframe width="100%" height="100%" frameborder="0" src="https://www.google.com/maps?q={{ data.location.lat }},{{ data.location.lon }}&z=10&output=embed"></iframe></div>
-                </div>
-
-                <div class="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-2xl border dark:border-slate-800 grid grid-cols-2 md:grid-cols-6 gap-4">
-                    <div class="text-center"><p class="text-[10px] font-bold text-slate-500 uppercase">Rain</p><p class="text-xl font-black">{{ data.forecast.forecastday[0].day.daily_chance_of_rain }}%</p></div>
-                    <div class="text-center"><p class="text-[10px] font-bold text-slate-500 uppercase">AQI</p><p class="text-xl font-black text-green-500">{{ data.current.air_quality['us-epa-index'] }}</p></div>
-                    <div class="text-center"><p class="text-[10px] font-bold text-slate-500 uppercase">UV</p><p class="text-xl font-black text-orange-500">{{ data.current.uv }}</p></div>
-                    <div class="text-center"><p class="text-[10px] font-bold text-slate-500 uppercase">Humidity</p><p class="text-xl font-black">{{ data.current.humidity }}%</p></div>
-                    <div class="text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">Pressure</p><p class="text-xl font-black">{{ data.current.pressure_mb }}mb</p></div>
-                    <div class="text-center"><p class="text-[10px] font-bold text-slate-400 uppercase">Visibility</p><p class="text-xl font-black">{{ data.current.vis_km }}KM</p></div>
-                </div>
-                {% endif %}
             </main>
         </div>
     </div>
@@ -127,6 +191,7 @@
 
     <script>
         // --- Core Logic ---
+        // --- Real-time Clock Logic ---
         function startClock(timezone) {
             setInterval(() => {
                 const now = new Date();
@@ -135,21 +200,97 @@
             }, 1000);
         }
         {% if data %} startClock("{{ data.location.tz_id }}"); {% else %} startClock(Intl.DateTimeFormat().resolvedOptions().timeZone); {% endif %}
-
+        // dark and light mode toggle
         function toggleTheme() {
             const isDark = document.getElementById('theme-tag').classList.toggle('dark');
             localStorage.theme = isDark ? 'dark' : 'light';
         }
         if (localStorage.theme === 'dark') document.getElementById('theme-tag').classList.add('dark');
-
+        //change language
         function changeLanguage() {
             const l = document.getElementById('langSelect').value;
             localStorage.lang = l;
             const t = { 
-                en: { env: "Environmental Intelligence", sBtn: "Analyze", news: "Weather World News" }, 
-                si: { env: "පාරිසරික තොරතුරු", sBtn: "විශ්ලේෂණය", news: "ලෝක කාලගුණ පුවත්" } 
+                en: { env: "Environmental Intelligence", sBtn: "Analyze", news: "Weather World News", cur: "Global Market (USD/LKR)", plan: "Weather-Smart Planner" }, 
+                si: { env: "පාරිසරික තොරතුරු", sBtn: "විශ්ලේෂණය", news: "ලෝක කාලගුණ පුවත්", cur: "විනිමය අනුපාත (USD/LKR)", plan: "ස්මාර්ට් වැඩ සැලසුම්කරු" } 
             };
+            document.getElementById('envTitle').innerText = t[l].env;
+            document.getElementById('searchBtn').innerText = t[l].sBtn;
             document.getElementById('newsTitle').innerText = t[l].news;
+            document.getElementById('currencyTitle').innerText = t[l].cur;
+            document.getElementById('plannerTitle').innerText = t[l].plan;
+        }
+        if(localStorage.lang) { document.getElementById('langSelect').value = localStorage.lang; changeLanguage(); }
+
+        // --- Smart Event Planner Logic ---
+        function addEvent() {
+            const title = document.getElementById('eventTitle').value;
+            const date = document.getElementById('eventDate').value;
+            if(!title) return alert("Please enter an event name!");
+            
+            const event = { title, date, id: Date.now() };
+            let events = JSON.parse(localStorage.getItem('weatherEvents') || '[]');
+            events.push(event);
+            localStorage.setItem('weatherEvents', JSON.stringify(events));
+            renderEvents();
+            document.getElementById('eventTitle').value = "";
+        }
+
+        function deleteEvent(id) {
+            let events = JSON.parse(localStorage.getItem('weatherEvents') || '[]');
+            events = events.filter(e => e.id !== id);
+            localStorage.setItem('weatherEvents', JSON.stringify(events));
+            renderEvents();
+        }
+
+        function renderEvents() {
+            const list = document.getElementById('eventList');
+            const events = JSON.parse(localStorage.getItem('weatherEvents') || '[]');
+            list.innerHTML = "";
+            
+            events.forEach(e => {
+                list.innerHTML += `
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl flex justify-between items-center border-l-4 border-blue-500">
+                        <div>
+                            <p class="text-[10px] font-bold">${e.title}</p>
+                            <p class="text-[8px] opacity-60">${e.date}</p>
+                        </div>
+                        <button onclick="deleteEvent(${e.id})" class="text-red-500 text-xs font-bold">✕</button>
+                    </div>
+                `;
+            });
+        }
+        renderEvents();
+        // --- Currency Converter Logic ---
+         function convertCurrency() {
+            const usd = document.getElementById('usdInput').value;
+            const rate = 312.45;
+            document.getElementById('lkrOutput').innerText = (usd * rate).toFixed(2) + " LKR";
+        }
+        // charts
+           new Chart(document.getElementById('historyChart'), {
+                type: 'bar',
+                data: {
+                    labels: [{% for item in history_graph %}"{{ item.date }}",{% endfor %}],
+                    datasets: [{ label: 'Temp', data: [{% for item in history_graph %}{{ item.temp }},{% endfor %}], backgroundColor: '#3b82f6', borderRadius: 12 }]
+                },
+                options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+            });
+
+            new Chart(document.getElementById('tempChart'), {
+                type: 'line',
+                data: {
+                    labels: {{ labels|safe }},
+                    datasets: [{ data: {{ temps|safe }}, borderColor: '#3b82f6', fill: true, backgroundColor: 'rgba(59, 130, 246, 0.1)', tension: 0.4, pointRadius: 0 }]
+                },
+                options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+            });
+            // voice search
+        function startVoiceSearch() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = document.getElementById('langSelect').value === 'si' ? 'si-LK' : 'en-US';
+            recognition.onresult = (e) => { document.getElementById('cityInput').value = e.results[0][0].transcript; document.getElementById('searchForm').submit(); };
+            recognition.start();
         }
     </script>
 </body>
