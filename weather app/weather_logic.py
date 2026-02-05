@@ -44,7 +44,7 @@ class WeatherFetcher:
                 data = response.json()
                 articles = data.get('articles', [])
                 news_list = []
-                for article in articles[:50]: # පුවත් 10ක් පමණක් ලබා ගනිමු
+                for article in articles[:50]: # පුවත් 50ක් පමණක් ලබා ගනිමු
                     news_list.append({
                         "title": article.get("title"),
                         "description": article.get("description"),
