@@ -7,38 +7,56 @@ from twilio.rest import Client
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
 
+# API & Credentials
 API_KEY = "1c79708b20d740c097d145309263001"
 fetcher = WeatherFetcher(API_KEY)
 
+# Alert Configurations (Replace with yours)
+EMAIL_ADDR = "your-email@gmail.com"
+EMAIL_PASS = "your-app-password"
+TW_SID = 'your_sid'; TW_TOKEN = 'your_token'; TW_PHONE = 'your_phone'
+
+def trigger_alerts(city, rain_chance, user_email, user_phone):
+    if rain_chance > 70:
+        msg = f"⚠️ Alert: High Rain Chance ({rain_chance}%) in {city}!"
+        # Email Logic
+        if user_email:
+            try:
+                mail = MIMEText(msg); mail['Subject'] = "Weather Alert"; mail['From'] = EMAIL_ADDR; mail['To'] = user_email
+                with smtplib.SMTP_SSL('smtp.gmail.com', 465) as s: s.login(EMAIL_ADDR, EMAIL_PASS); s.send_message(mail)
+            except: pass
+        # SMS Logic (Twilio)
+        if user_phone:
+            try: Client(TW_SID, TW_TOKEN).messages.create(body=msg, from_=TW_PHONE, to=user_phone)
+            except: pass
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    weather_data = None
-    history_graph = [] # පසුගිය දින 7 සඳහා
-    hourly_labels, hourly_temps = [], []
-
+    weather_data, history_graph = None, []
+    h_labels, h_temps = [], []
     if 'history' not in session: session['history'] = []
 
     if request.method == 'POST':
         city = request.form.get('city')
-        weather_data = fetcher.fetch_weather(city)
+        email = request.form.get('email')
+        phone = request.form.get('phone')
         
+        weather_data = fetcher.fetch_weather(city)
         if weather_data:
-            # 1. පසුගිය දින 7ක ඉතිහාසය ලබා ගැනීම
             history_graph = fetcher.fetch_7day_history(city)
+            trigger_alerts(city, weather_data['forecast']['forecastday'][0]['day']['daily_chance_of_rain'], email, phone)
             
-            # 2. පැය 24ක දත්ත (Chart 1)
             for hour in weather_data['forecast']['forecastday'][0]['hour']:
-                hourly_labels.append(hour['time'].split(' ')[1])
-                hourly_temps.append(hour['temp_c'])
+                h_labels.append(hour['time'].split(' ')[1])
+                h_temps.append(hour['temp_c'])
             
-            # 3. Search History Update
             name = weather_data['location']['name']
             if name not in session['history']:
                 session['history'] = [name] + session['history'][:4]
                 session.modified = True
 
     return render_template('index.html', data=weather_data, history_list=session['history'], 
-                           labels=hourly_labels, temps=hourly_temps, history_graph=history_graph)
+                           labels=h_labels, temps=h_temps, history_graph=history_graph)
 
 if __name__ == '__main__':
     app.run(debug=True)
