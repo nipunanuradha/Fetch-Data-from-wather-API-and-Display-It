@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WeatherPro Elite v7.5</title>
+    <title>WeatherPro Elite v8.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>tailwind.config = { darkMode: 'class' }</script>
@@ -46,11 +46,11 @@
                 <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800">
                     <h3 id="plannerTitle" class="text-[10px] font-black text-blue-500 mb-4 uppercase tracking-widest italic">Weather-Smart Planner</h3>
                     <div class="space-y-3">
-                        <input type="text" id="eventTitle" placeholder="Event Name (e.g. Trip)" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-xs border-none outline-none">
+                        <input type="text" id="eventTitle" placeholder="Event Name" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-xs border-none outline-none">
                         <select id="eventDate" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-xs border-none outline-none">
                             {% if data %}
                                 {% for day in data.forecast.forecastday %}
-                                    <option value="{{ day.date }}">{{ day.date }} (Rain: {{ day.day.daily_chance_of_rain }}%) </option>
+                                    <option value="{{ day.date }}">{{ day.date }} (Rain: {{ day.day.daily_chance_of_rain }}%)</option>
                                 {% endfor %}
                             {% else %}<option disabled>Search first</option>{% endif %}
                         </select>
@@ -68,7 +68,7 @@
                     </div>
                 </div>
 
-                       <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800">
                     <h3 id="historyTitle" class="text-[10px] font-black text-slate-400 mb-4 uppercase tracking-widest">Recent Activity</h3>
                     <div class="space-y-2">
                         {% for city in history_list %}
@@ -83,7 +83,12 @@
                 <div class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-[3.5rem] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden">
                     <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
                         <div>
-                            <h2 class="text-2xl font-bold opacity-80 mb-2">{{ data.location.name }}, {{ data.location.country }}</h2>
+                            <div class="flex items-center gap-2 mb-2">
+                                <h2 class="text-2xl font-bold opacity-80">{{ data.location.name }}, {{ data.location.country }}</h2>
+                                <span class="px-3 py-1 bg-white/20 rounded-full text-[10px] font-black uppercase backdrop-blur-md">
+                                    {% if data.current.is_day == 1 %} ☀️ DAY TIME {% else %} 🌙 NIGHT TIME {% endif %}
+                                </span>
+                            </div>
                             <h3 class="text-8xl font-black tracking-tighter mb-4">{{ data.current.temp_c }}°C</h3>
                              <div class="flex items-center justify-center md:justify-start gap-4">
                                 <span class="bg-white/20 px-4 py-1 rounded-full text-xs font-bold backdrop-blur">H: {{ data.forecast.forecastday[0].day.maxtemp_c }}° L: {{ data.forecast.forecastday[0].day.mintemp_c }}°</span>
@@ -91,23 +96,23 @@
                             </div>
                         </div>
                         <div class="text-center">
-                            <img src="{{ data.current.condition.icon }}" class="w-32 h-32 animate-pulse">
+                            <img src="{{ data.current.condition.icon }}" class="w-32 h-32 animate-pulse mx-auto">
                             <p class="text-xl font-black uppercase tracking-widest">{{ data.current.condition.text }}</p>
                         </div>
                     </div>
                     <div class="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
                 </div>
-                {% endif %}
 
-                
-
-                {% if data %}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="rounded-[3rem] overflow-hidden shadow-xl h-80 border-4 border-white dark:border-slate-800"><iframe width="100%" height="100%" src="https://embed.windy.com/embed2.html?lat={{ data.location.lat }}&lon={{ data.location.lon }}&zoom=5&overlay=satellite" frameborder="0"></iframe></div>
-                    <div class="rounded-[3rem] overflow-hidden shadow-xl h-80 border-4 border-white dark:border-slate-800"><iframe width="100%" height="100%" frameborder="0" src="https://www.google.com/maps?q={{ data.location.lat }},{{ data.location.lon }}&z=10&output=embed"></iframe></div>
+                    <div class="rounded-[3rem] overflow-hidden shadow-xl h-80 border-4 border-white dark:border-slate-800 relative">
+                        <iframe width="100%" height="100%" src="https://embed.windy.com/embed2.html?lat={{ data.location.lat }}&lon={{ data.location.lon }}&zoom=5&overlay=satellite" frameborder="0"></iframe>
+                    </div>
+                    <div class="rounded-[3rem] overflow-hidden shadow-xl h-80 border-4 border-white dark:border-slate-800 relative">
+                        <iframe width="100%" height="100%" frameborder="0" src="https://www.google.com/maps?q={{ data.location.lat }},{{ data.location.lon }}&z=10&output=embed"></iframe>
+                    </div>
                 </div>
 
-            <div class="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-2xl border dark:border-slate-800">
+                <div class="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-2xl border dark:border-slate-800">
                     <div class="flex justify-between items-center mb-6">
                         <h3 id="envTitle" class="text-xs font-bold text-blue-500 uppercase tracking-widest">Environmental Intelligence</h3>
                         <span class="text-[10px] bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full font-bold">Zone: {{ data.location.tz_id }}</span>
@@ -149,20 +154,36 @@
                     </div>
                 </div>
 
+
+                <div class="bg-white dark:bg-slate-900 p-8 rounded-[3.5rem] shadow-2xl border dark:border-slate-800">
+                    <h3 id="astroTitle" class="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-6">Sun & Moon Cycles</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <div class="flex flex-col items-center bg-slate-50 dark:bg-slate-800 p-4 rounded-[2rem] border-b-4 border-yellow-400">
+                            <span class="text-2xl mb-2">🌅</span>
+                            <p id="labelSunrise" class="text-[10px] font-bold text-slate-400 uppercase">Sunrise</p>
+                            <p class="text-lg font-black">{{ data.forecast.forecastday[0].astro.sunrise }}</p>
+                        </div>
+                        <div class="flex flex-col items-center bg-slate-50 dark:bg-slate-800 p-4 rounded-[2rem] border-b-4 border-orange-600">
+                            <span class="text-2xl mb-2">🌇</span>
+                            <p id="labelSunset" class="text-[10px] font-bold text-slate-400 uppercase">Sunset</p>
+                            <p class="text-lg font-black">{{ data.forecast.forecastday[0].astro.sunset }}</p>
+                        </div>
+                        <div class="flex flex-col items-center bg-slate-50 dark:bg-slate-800 p-4 rounded-[2rem] border-b-4 border-blue-400">
+                            <span class="text-2xl mb-2">🌙</span>
+                            <p id="labelMoonrise" class="text-[10px] font-bold text-slate-400 uppercase">Moonrise</p>
+                            <p class="text-lg font-black">{{ data.forecast.forecastday[0].astro.moonrise }}</p>
+                        </div>
+                        <div class="flex flex-col items-center bg-slate-50 dark:bg-slate-800 p-4 rounded-[2rem] border-b-4 border-indigo-900">
+                            <span class="text-2xl mb-2">🌑</span>
+                            <p id="labelMoonset" class="text-[10px] font-bold text-slate-400 uppercase">Moonset</p>
+                            <p class="text-lg font-black">{{ data.forecast.forecastday[0].astro.moonset }}</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     <div class="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-xl border dark:border-slate-800"><h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">7-Day History Trend</h3><canvas id="historyChart" height="150"></canvas></div>
                     <div class="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-xl border dark:border-slate-800"><h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">24-Hour Temp Variation</h3><canvas id="tempChart" height="150"></canvas></div>
-                </div>
-
-                <div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
-                    {% for day in data.forecast.forecastday %}
-                    <div class="min-w-[150px] bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] text-center shadow-lg border border-transparent hover:border-blue-500 transition-all duration-300">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ day.date[5:] }}</p>
-                        <img src="{{ day.day.condition.icon }}" class="mx-auto w-12 h-12 my-2">
-                        <p class="text-xl font-black">{{ day.day.avgtemp_c|round(0) }}°C</p>
-                        <p class="text-[8px] font-bold text-blue-500">🌧️ {{ day.day.daily_chance_of_rain }}%</p>
-                    </div>
-                    {% endfor %}
                 </div>
                 {% endif %}
 
@@ -171,7 +192,7 @@
                         <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span></span>
                         Live Weather World News
                     </h3>
-                    <div class="h-[300px] overflow-y-auto pr-2 no-scrollbar" style="scrollbar-width: thin;">
+                   <div class="h-[400px] overflow-y-auto pr-2 no-scrollbar" style="scrollbar-width: thin;">
                          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {% for article in news %}
                             <a href="{{ article.url }}" target="_blank" class="group flex gap-4 p-4 rounded-3xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
@@ -191,9 +212,11 @@
 
     
 
+[Image of sunrise and sunset diagram]
+
+
     <script>
-        // --- Core Logic ---
-        // --- Real-time Clock Logic ---
+        // Clock
         function startClock(timezone) {
             setInterval(() => {
                 const now = new Date();
@@ -202,34 +225,39 @@
             }, 1000);
         }
         {% if data %} startClock("{{ data.location.tz_id }}"); {% else %} startClock(Intl.DateTimeFormat().resolvedOptions().timeZone); {% endif %}
-        // dark and light mode toggle
-        function toggleTheme() {
-            const isDark = document.getElementById('theme-tag').classList.toggle('dark');
-            localStorage.theme = isDark ? 'dark' : 'light';
-        }
-        if (localStorage.theme === 'dark') document.getElementById('theme-tag').classList.add('dark');
-        //change language
+
+        // Language
         function changeLanguage() {
             const l = document.getElementById('langSelect').value;
             localStorage.lang = l;
             const t = { 
-                en: { env: "Environmental Intelligence", sBtn: "Analyze", news: "Weather World News", cur: "Global Market (USD/LKR)", plan: "Weather-Smart Planner" }, 
-                si: { env: "පාරිසරික තොරතුරු", sBtn: "විශ්ලේෂණය", news: "ලෝක කාලගුණ පුවත්", cur: "විනිමය අනුපාත (USD/LKR)", plan: "ස්මාර්ට් වැඩ සැලසුම්කරු" } 
+                en: { env: "Environmental Intelligence", sBtn: "Analyze", news: "Weather World News", cur: "Global Market (USD/LKR)", plan: "Weather-Smart Planner", astro: "Sun & Moon Cycles", sunrise: "Sunrise", sunset: "Sunset", moonrise: "Moonrise", moonset: "Moonset" }, 
+                si: { env: "පාරිසරික තොරතුරු", sBtn: "විශ්ලේෂණය", news: "ලෝක කාලගුණ පුවත්", cur: "විනිමය අනුපාත (USD/LKR)", plan: "ස්මාර්ට් වැඩ සැලසුම්කරු", astro: "හිරු සහ සඳු චක්‍ර", sunrise: "හිරු උදාව", sunset: "හිරු බැසීම", moonrise: "සඳු උදාව", moonset: "සඳු බැසීම" } 
             };
             document.getElementById('envTitle').innerText = t[l].env;
             document.getElementById('searchBtn').innerText = t[l].sBtn;
             document.getElementById('newsTitle').innerText = t[l].news;
             document.getElementById('currencyTitle').innerText = t[l].cur;
             document.getElementById('plannerTitle').innerText = t[l].plan;
+            document.getElementById('astroTitle').innerText = t[l].astro;
+            document.getElementById('labelSunrise').innerText = t[l].sunrise;
+            document.getElementById('labelSunset').innerText = t[l].sunset;
+            document.getElementById('labelMoonrise').innerText = t[l].moonrise;
+            document.getElementById('labelMoonset').innerText = t[l].moonset;
         }
         if(localStorage.lang) { document.getElementById('langSelect').value = localStorage.lang; changeLanguage(); }
 
-        // --- Smart Event Planner Logic ---
+        // Core Functions (Planner, Theme, Voice, Charts) - මෙහි පහතින් ඔයාගේ පරණ කේතය එලෙසම ඇතුළත් කරන්න
+        function toggleTheme() {
+            const isDark = document.getElementById('theme-tag').classList.toggle('dark');
+            localStorage.theme = isDark ? 'dark' : 'light';
+        }
+        if (localStorage.theme === 'dark') document.getElementById('theme-tag').classList.add('dark');
+
         function addEvent() {
             const title = document.getElementById('eventTitle').value;
             const date = document.getElementById('eventDate').value;
             if(!title) return alert("Please enter an event name!");
-            
             const event = { title, date, id: Date.now() };
             let events = JSON.parse(localStorage.getItem('weatherEvents') || '[]');
             events.push(event);
@@ -238,39 +266,36 @@
             document.getElementById('eventTitle').value = "";
         }
 
+        function renderEvents() {
+            const list = document.getElementById('eventList');
+            const events = JSON.parse(localStorage.getItem('weatherEvents') || '[]');
+            list.innerHTML = "";
+            events.forEach(e => {
+                list.innerHTML += `<div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl flex justify-between items-center border-l-4 border-blue-500 mb-2"><div><p class="text-[10px] font-bold">${e.title}</p><p class="text-[8px] opacity-60">${e.date}</p></div><button onclick="deleteEvent(${e.id})" class="text-red-500 text-xs">✕</button></div>`;
+            });
+        }
         function deleteEvent(id) {
             let events = JSON.parse(localStorage.getItem('weatherEvents') || '[]');
             events = events.filter(e => e.id !== id);
             localStorage.setItem('weatherEvents', JSON.stringify(events));
             renderEvents();
         }
-
-        function renderEvents() {
-            const list = document.getElementById('eventList');
-            const events = JSON.parse(localStorage.getItem('weatherEvents') || '[]');
-            list.innerHTML = "";
-            
-            events.forEach(e => {
-                list.innerHTML += `
-                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl flex justify-between items-center border-l-4 border-blue-500">
-                        <div>
-                            <p class="text-[10px] font-bold">${e.title}</p>
-                            <p class="text-[8px] opacity-60">${e.date}</p>
-                        </div>
-                        <button onclick="deleteEvent(${e.id})" class="text-red-500 text-xs font-bold">✕</button>
-                    </div>
-                `;
-            });
-        }
         renderEvents();
-        // --- Currency Converter Logic ---
-         function convertCurrency() {
+
+        function convertCurrency() {
             const usd = document.getElementById('usdInput').value;
-            const rate = 312.45;
-            document.getElementById('lkrOutput').innerText = (usd * rate).toFixed(2) + " LKR";
+            document.getElementById('lkrOutput').innerText = (usd * 312.45).toFixed(2) + " LKR";
         }
-        // charts
-           new Chart(document.getElementById('historyChart'), {
+
+        function startVoiceSearch() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = document.getElementById('langSelect').value === 'si' ? 'si-LK' : 'en-US';
+            recognition.onresult = (e) => { document.getElementById('cityInput').value = e.results[0][0].transcript; document.getElementById('searchForm').submit(); };
+            recognition.start();
+        }
+
+        {% if data %}
+            new Chart(document.getElementById('historyChart'), {
                 type: 'bar',
                 data: {
                     labels: [{% for item in history_graph %}"{{ item.date }}",{% endfor %}],
@@ -278,7 +303,6 @@
                 },
                 options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
             });
-
             new Chart(document.getElementById('tempChart'), {
                 type: 'line',
                 data: {
@@ -287,13 +311,7 @@
                 },
                 options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
             });
-            // voice search
-        function startVoiceSearch() {
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = document.getElementById('langSelect').value === 'si' ? 'si-LK' : 'en-US';
-            recognition.onresult = (e) => { document.getElementById('cityInput').value = e.results[0][0].transcript; document.getElementById('searchForm').submit(); };
-            recognition.start();
-        }
+        {% endif %}
     </script>
 </body>
 </html>

@@ -10,7 +10,7 @@ app.secret_key = secrets.token_hex(16)
 API_KEY = "1c79708b20d740c097d145309263001"
 fetcher = WeatherFetcher(API_KEY)
 
-# Alert Configurations
+# Alerts Config
 EMAIL_ADDR = "your-email@gmail.com"
 EMAIL_PASS = "your-app-password"
 TW_SID = 'your_sid'; TW_TOKEN = 'your_token'; TW_PHONE = 'your_phone'
@@ -31,7 +31,7 @@ def trigger_alerts(city, rain_chance, user_email, user_phone):
 def index():
     weather_data, history_graph = None, []
     h_labels, h_temps = [], []
-    news_articles = fetcher.fetch_weather_news() # පුවත් ලබා ගැනීම
+    news_articles = fetcher.fetch_weather_news()
     
     if 'history' not in session: session['history'] = []
 
