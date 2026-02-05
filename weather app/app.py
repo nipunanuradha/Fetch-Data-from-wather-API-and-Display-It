@@ -7,7 +7,6 @@ from twilio.rest import Client
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
 
-# API & Credentials
 API_KEY = "1c79708b20d740c097d145309263001"
 fetcher = WeatherFetcher(API_KEY)
 
@@ -32,6 +31,8 @@ def trigger_alerts(city, rain_chance, user_email, user_phone):
 def index():
     weather_data, history_graph = None, []
     h_labels, h_temps = [], []
+    news_articles = fetcher.fetch_weather_news() # පුවත් ලබා ගැනීම
+    
     if 'history' not in session: session['history'] = []
 
     if request.method == 'POST':
@@ -54,7 +55,8 @@ def index():
                 session.modified = True
 
     return render_template('index.html', data=weather_data, history_list=session['history'], 
-                           labels=h_labels, temps=h_temps, history_graph=history_graph)
+                           labels=h_labels, temps=h_temps, history_graph=history_graph, 
+                           news=news_articles)
 
 if __name__ == '__main__':
     app.run(debug=True)
