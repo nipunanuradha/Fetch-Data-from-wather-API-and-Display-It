@@ -7,7 +7,8 @@ class WeatherFetcher:
         self.forecast_url = "http://api.weatherapi.com/v1/forecast.json"
         self.history_url = "http://api.weatherapi.com/v1/history.json"
         # News ලබා ගැනීමට NewsAPI (නොමිලේ ලබාගත හැක) හෝ මෙහි පෙන්වා ඇති පරිදි ලබා ගත හැක
-        self.news_url = "https://gnews.io/api/v4/search?q=weather&token=YOUR_GNEWS_API_KEY&lang=en"
+        self.news_api_key = "de583baf345141545d4711727b8073cb" 
+        self.news_url = f"https://gnews.io/api/v4/search?q=weather&token={self.news_api_key}&lang=en"
 
     def fetch_weather(self, city):
         params = {'key': self.api_key, 'q': city, 'days': 5, 'aqi': 'yes'}
@@ -34,22 +35,25 @@ class WeatherFetcher:
         # සාම්පල පුවත් දත්ත (සැබෑ API එකක් සම්බන්ධ කරන තෙක්)
         # ඔබ සතුව GNews හෝ NewsAPI key එකක් තිබේ නම් ඉහත URL එක භාවිතා කරන්න.
         try:
-            # මෙහිදී අපි සරල නිදසුනක් පෙන්වමු
-            news_data = [
-                {
-                    "title": "Global Warming: 2026 Set to be Warmest Year",
-                    "description": "Climate scientists warn of rising temperatures globally.",
-                    "image": "https://images.unsplash.com/photo-1564314968303-86c5ad2b9a4c?auto=format&fit=crop&w=400",
-                    "publishedAt": "2026-02-05T10:00:00Z",
-                    "url": "https://example.com/news1"
-                },
-                {
-                    "title": "Severe Storms Predicted for South Asia",
-                    "description": "Monsoon patterns are shifting earlier than expected this year.",
-                    "image": "https://images.unsplash.com/photo-1527482797697-8795b05a13fe?auto=format&fit=crop&w=400",
-                    "publishedAt": "2026-02-05T09:30:00Z",
-                    "url": "https://example.com/news2"
-                }
-            ]
-            return news_data
-        except: return []
+            response = requests.get(self.news_url)
+            if response.status_code == 200:
+                data = response.json()
+                # GNews API එකේ පුවත් එන්නේ 'articles' කියන key එක යටතේ
+                articles = data.get('articles', [])
+                
+                news_list = []
+                for article in articles:
+                    news_list.append({
+                        "title": article.get("title"),
+                        "description": article.get("description"),
+                        "image": article.get("image"), # GNews වල image URL එක එන්නේ 'image' නමින්
+                        "publishedAt": article.get("publishedAt"),
+                        "url": article.get("url")
+                    })
+                return news_list
+            else:
+                print(f"Error fetching news: {response.status_code}")
+                return []
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return []
