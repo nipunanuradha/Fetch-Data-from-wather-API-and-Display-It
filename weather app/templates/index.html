@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WeatherPro Elite Multilingual</title>
+    <title>WeatherPro Elite Max</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>tailwind.config = { darkMode: 'class' }</script>
@@ -11,35 +11,35 @@
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-all duration-500">
 
     <div class="max-w-7xl mx-auto p-4 md:p-8">
-        <header class="flex flex-wrap justify-between items-center mb-8 bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border border-slate-100 dark:border-slate-800">
+        <header class="flex flex-wrap justify-between items-center mb-8 bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800">
             <div>
-                <h1 class="text-3xl font-black text-blue-600 tracking-tighter">WeatherPro <span class="text-slate-400 font-light italic">Elite</span></h1>
-                <p id="tagline" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Advanced Global Analytics</p>
-            </div>
-            
-            <div class="flex items-center gap-3">
-                <select id="langSelect" onchange="changeLanguage()" class="bg-slate-100 dark:bg-slate-800 p-2 rounded-xl text-xs font-bold border-none outline-none cursor-pointer">
-                    <option value="en">English 🇺🇸</option>
+                <h1 class="text-3xl font-black text-blue-600">WeatherPro <span class="text-slate-400 font-light italic">Elite Max</span></h1>
+                <select id="langSelect" onchange="changeLanguage()" class="mt-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg text-[10px] font-bold outline-none">
+                    <option value="en">ENGLISH 🇺🇸</option>
                     <option value="si">සිංහල 🇱🇰</option>
                 </select>
-                <button onclick="startVoiceSearch()" class="p-3 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-2xl hover:scale-110 transition">🎤</button>
-                <button onclick="toggleTheme()" class="p-3 bg-slate-100 dark:bg-slate-800 rounded-2xl transition"><span id="theme-icon">🌙</span></button>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="startVoiceSearch()" class="p-4 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-2xl hover:scale-110 transition">🎤</button>
+                <button onclick="toggleTheme()" class="p-4 bg-slate-100 dark:bg-slate-800 rounded-2xl transition"><span id="theme-icon">🌙</span></button>
             </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <aside class="lg:col-span-3 space-y-6">
-                <form id="searchForm" method="POST" class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl space-y-4 border border-slate-100 dark:border-slate-800">
-                    <input type="text" id="cityInput" name="city" placeholder="Search City..." required class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none outline-none focus:ring-2 focus:ring-blue-500">
-                    <input type="email" id="emailInput" name="email" placeholder="Email for Alerts" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none">
-                    <input type="text" id="phoneInput" name="phone" placeholder="Phone (+94...)" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none">
+                <form id="searchForm" method="POST" class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl space-y-4">
+                    <input type="text" id="cityInput" name="city" placeholder="Enter City..." required class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="flex gap-2">
+                        <input type="email" name="email" placeholder="Email" class="w-1/2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-xs border-none">
+                        <input type="text" name="phone" placeholder="SMS" class="w-1/2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-xs border-none">
+                    </div>
                     <button type="submit" id="searchBtn" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold shadow-lg hover:bg-blue-700 transition">Analyze Weather</button>
                 </form>
 
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border border-slate-100 dark:border-slate-800">
-                    <h3 id="historyTitle" class="text-xs font-black text-slate-400 mb-4 uppercase">Recent History</h3>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl">
+                    <h3 id="historyTitle" class="text-[10px] font-black text-slate-400 mb-4 uppercase tracking-widest">Recent Searches</h3>
                     <div class="space-y-2">
-                        {% for city in history %}
+                        {% for city in history_list %}
                         <form method="POST"><input type="hidden" name="city" value="{{ city }}"><button type="submit" class="w-full text-left p-3 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/30 transition text-sm font-semibold">📍 {{ city }}</button></form>
                         {% endfor %}
                     </div>
@@ -49,38 +49,39 @@
             <main class="lg:col-span-9 space-y-6">
                 {% if data %}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="rounded-[3rem] overflow-hidden shadow-2xl h-[400px] border-4 border-white dark:border-slate-800 relative">
-                        <div id="satTitle" class="absolute top-4 left-4 z-10 bg-black/50 text-white text-[10px] px-3 py-1 rounded-full backdrop-blur uppercase font-bold tracking-widest">Live Satellite View</div>
-                        <iframe width="100%" height="100%" src="https://embed.windy.com/embed2.html?lat={{ data.location.lat }}&lon={{ data.location.lon }}&zoom=5&overlay=satellite&metricWind=km%2Fh&metricTemp=%C2%B0C" frameborder="0"></iframe>
+                    <div class="rounded-[3rem] overflow-hidden shadow-2xl h-80 border-4 border-white dark:border-slate-800 relative">
+                        <div class="absolute top-4 left-4 z-10 bg-black/50 text-white text-[10px] px-3 py-1 rounded-full backdrop-blur uppercase font-bold">Live Satellite View</div>
+                        <iframe width="100%" height="100%" src="https://embed.windy.com/embed2.html?lat={{ data.location.lat }}&lon={{ data.location.lon }}&zoom=5&overlay=satellite" frameborder="0"></iframe>
                     </div>
-
-                    <div class="rounded-[3rem] overflow-hidden shadow-2xl h-[400px] border-4 border-white dark:border-slate-800 relative">
-                        <div id="mapTitle" class="absolute top-4 left-4 z-10 bg-black/50 text-white text-[10px] px-3 py-1 rounded-full backdrop-blur uppercase font-bold tracking-widest">City Location Map</div>
+                    <div class="rounded-[3rem] overflow-hidden shadow-2xl h-80 border-4 border-white dark:border-slate-800 relative">
+                        <div class="absolute top-4 left-4 z-10 bg-black/50 text-white text-[10px] px-3 py-1 rounded-full backdrop-blur uppercase font-bold">Location Map</div>
                         <iframe width="100%" height="100%" frameborder="0" src="https://www.google.com/maps?q={{ data.location.lat }},{{ data.location.lon }}&z=10&output=embed"></iframe>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-xl border border-slate-100 dark:border-slate-800">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                        <div class="text-center"><p id="labelRain" class="text-xs font-bold text-slate-400 uppercase">Rain Chance</p><p class="text-3xl font-black text-blue-500">{{ data.forecast.forecastday[0].day.daily_chance_of_rain }}%</p></div>
-                        <div class="text-center"><p id="labelAqi" class="text-xs font-bold text-slate-400 uppercase">EPA AQI</p><p class="text-3xl font-black text-green-500">{{ data.current.air_quality['us-epa-index'] }}</p></div>
-                        <div class="text-center"><p id="labelUv" class="text-xs font-bold text-slate-400 uppercase">UV Index</p><p class="text-3xl font-black text-orange-500">{{ data.current.uv }}</p></div>
-                        <div class="text-center"><p id="labelHumidity" class="text-xs font-bold text-slate-400 uppercase">Humidity</p><p class="text-3xl font-black text-slate-700 dark:text-slate-300">{{ data.current.humidity }}%</p></div>
-                    </div>
+                <div class="bg-white dark:bg-slate-900 p-8 rounded-[3.5rem] shadow-xl border dark:border-slate-800">
+                    <h3 id="historyGraphTitle" class="text-xs font-bold text-blue-500 uppercase mb-6 tracking-widest">🗓️ 7-Day Temperature History</h3>
+                    <canvas id="historyChart" height="80"></canvas>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 p-8 rounded-[3.5rem] shadow-xl border border-slate-100 dark:border-slate-800">
-                    <h3 id="chartTitle" class="text-xs font-bold text-slate-400 uppercase mb-4 tracking-widest">Temperature Variation (24H)</h3>
-                    <canvas id="tempChart" height="100"></canvas>
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                    <div class="xl:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-xl">
+                        <h3 id="chartTitle" class="text-xs font-bold text-slate-400 uppercase mb-4 tracking-widest">24-Hour Variation</h3>
+                        <canvas id="tempChart" height="120"></canvas>
+                    </div>
+                    <div class="bg-blue-600 p-8 rounded-[3rem] text-white shadow-xl flex flex-col justify-center text-center">
+                        <p id="labelRain" class="text-xs font-bold opacity-70 uppercase">Rain Chance</p>
+                        <h4 class="text-6xl font-black my-2">{{ data.forecast.forecastday[0].day.daily_chance_of_rain }}%</h4>
+                        <p class="text-sm font-medium">EPA AQI Index: {{ data.current.air_quality['us-epa-index'] }}</p>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
                     {% for day in data.forecast.forecastday %}
                     <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] text-center shadow-lg border border-transparent hover:border-blue-500 transition-all duration-300">
-                        <p class="text-xs font-bold text-slate-400">{{ day.date[5:] }}</p>
+                        <p class="text-[10px] font-bold text-slate-400">{{ day.date[5:] }}</p>
                         <img src="{{ day.day.condition.icon }}" class="mx-auto w-12 h-12 my-2">
-                        <p class="text-2xl font-black">{{ day.day.avgtemp_c|round(0) }}°</p>
-                        <p class="text-[10px] text-blue-500 font-bold">💧 {{ day.day.daily_chance_of_rain }}%</p>
+                        <p class="text-xl font-black">{{ day.day.avgtemp_c|round(0) }}°</p>
                     </div>
                     {% endfor %}
                 </div>
@@ -92,99 +93,24 @@
     
 
     <script>
-        // --- TRANSLATION DATA ---
-        const translations = {
-            en: {
-                tagline: "Advanced Global Analytics",
-                searchPlaceholder: "Search City...",
-                emailPlaceholder: "Email for Alerts",
-                phonePlaceholder: "Phone (+94...)",
-                searchBtn: "Analyze Weather",
-                historyTitle: "Recent History",
-                satTitle: "Live Satellite View",
-                mapTitle: "City Location Map",
-                labelRain: "Rain Chance",
-                labelAqi: "EPA AQI",
-                labelUv: "UV Index",
-                labelHumidity: "Humidity",
-                chartTitle: "Temperature Variation (24H)",
-                alertTitle: "Weather Alert! ⛈️",
-                alertBody: "High chance of rain today."
-            },
-            si: {
-                tagline: "ගෝලීය කාලගුණ විශ්ලේෂණය",
-                searchPlaceholder: "නගරය සොයන්න...",
-                emailPlaceholder: "ඊමේල් ඇඟවීම් සඳහා",
-                phonePlaceholder: "දුරකථන අංකය (+94...)",
-                searchBtn: "දත්ත ලබාගන්න",
-                historyTitle: "පසුගිය සෙවුම්",
-                satTitle: "සජීවී චන්ද්‍රිකා දර්ශනය",
-                mapTitle: "නගරයේ පිහිටීම",
-                labelRain: "වැසි සම්භාවිතාව",
-                labelAqi: "වායු තත්ත්වය",
-                labelUv: "UV දර්ශකය",
-                labelHumidity: "තෙතමනය",
-                chartTitle: "පැය 24ක උෂ්ණත්ව වෙනස්වීම",
-                alertTitle: "කාලගුණ අනතුරු ඇඟවීම! ⛈️",
-                alertBody: "අද වැසි ඇතිවීමේ වැඩි සම්භාවිතාවක් ඇත."
-            }
-        };
-
-        function changeLanguage() {
-            const lang = document.getElementById('langSelect').value;
-            const t = translations[lang];
-
-            document.getElementById('tagline').innerText = t.tagline;
-            document.getElementById('cityInput').placeholder = t.searchPlaceholder;
-            document.getElementById('emailInput').placeholder = t.emailPlaceholder;
-            document.getElementById('phoneInput').placeholder = t.phonePlaceholder;
-            document.getElementById('searchBtn').innerText = t.searchBtn;
-            document.getElementById('historyTitle').innerText = t.historyTitle;
-            
-            if (document.getElementById('satTitle')) document.getElementById('satTitle').innerText = t.satTitle;
-            if (document.getElementById('mapTitle')) document.getElementById('mapTitle').innerText = t.mapTitle;
-            if (document.getElementById('labelRain')) document.getElementById('labelRain').innerText = t.labelRain;
-            if (document.getElementById('labelAqi')) document.getElementById('labelAqi').innerText = t.labelAqi;
-            if (document.getElementById('labelUv')) document.getElementById('labelUv').innerText = t.labelUv;
-            if (document.getElementById('labelHumidity')) document.getElementById('labelHumidity').innerText = t.labelHumidity;
-            if (document.getElementById('chartTitle')) document.getElementById('chartTitle').innerText = t.chartTitle;
-
-            localStorage.lang = lang;
-        }
-
-        // --- PREVIOUS FUNCTIONS ---
-        function startVoiceSearch() {
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = document.getElementById('langSelect').value === 'si' ? 'si-LK' : 'en-US';
-            recognition.onstart = () => { document.getElementById('cityInput').placeholder = "..."; };
-            recognition.onresult = (event) => {
-                document.getElementById('cityInput').value = event.results[0][0].transcript;
-                document.getElementById('searchForm').submit();
-            };
-            recognition.start();
-        }
-
-        function toggleTheme() {
-            const h = document.getElementById('theme-tag');
-            h.classList.toggle('dark');
-            localStorage.theme = h.classList.contains('dark') ? 'dark' : 'light';
-        }
-
-        // Initialize Settings
-        if (localStorage.theme === 'dark') document.getElementById('theme-tag').classList.add('dark');
-        if (localStorage.lang) {
-            document.getElementById('langSelect').value = localStorage.lang;
-            changeLanguage();
-        }
-
+        // --- CHARTS CONFIGURATION ---
         {% if data %}
-            // Desktop Notifications
-            const lang = localStorage.lang || 'en';
-            if ({{ data.forecast.forecastday[0].day.daily_chance_of_rain }} > 70 && Notification.permission === "granted") {
-                new Notification(translations[lang].alertTitle, { body: translations[lang].alertBody });
-            }
+            // 1. History Chart (Last 7 Days)
+            new Chart(document.getElementById('historyChart'), {
+                type: 'bar',
+                data: {
+                    labels: [{% for item in history_graph %}"{{ item.date }}",{% endfor %}],
+                    datasets: [{
+                        label: 'Avg Temp',
+                        data: [{% for item in history_graph %}{{ item.temp }},{% endfor %}],
+                        backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                        borderRadius: 10,
+                    }]
+                },
+                options: { plugins: { legend: { display: false } }, scales: { y: { display: true }, x: { grid: { display: false } } } }
+            });
 
-            // Temperature Chart
+            // 2. Hourly Chart (24H)
             new Chart(document.getElementById('tempChart'), {
                 type: 'line',
                 data: {
@@ -196,9 +122,40 @@
                         fill: true, tension: 0.4, borderWidth: 4, pointRadius: 0
                     }]
                 },
-                options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
+                options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
             });
         {% endif %}
+
+        // --- PREVIOUS CORE FUNCTIONS (VOICE, THEME, LANG) ---
+        function startVoiceSearch() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = document.getElementById('langSelect').value === 'si' ? 'si-LK' : 'en-US';
+            recognition.onresult = (e) => {
+                document.getElementById('cityInput').value = e.results[0][0].transcript;
+                document.getElementById('searchForm').submit();
+            };
+            recognition.start();
+        }
+
+        function toggleTheme() {
+            document.getElementById('theme-tag').classList.toggle('dark');
+            localStorage.theme = document.getElementById('theme-tag').classList.contains('dark') ? 'dark' : 'light';
+        }
+        if (localStorage.theme === 'dark') document.getElementById('theme-tag').classList.add('dark');
+
+        // Multi-language Logic (Simplified for brevity)
+        const translations = {
+            en: { hGraph: "🗓️ 7-Day Temperature History", search: "Analyze Weather", history: "Recent Searches" },
+            si: { hGraph: "🗓️ පසුගිය දින 7ක උෂ්ණත්වය", search: "දත්ත ලබාගන්න", history: "පසුගිය සෙවුම්" }
+        };
+
+        function changeLanguage() {
+            const l = document.getElementById('langSelect').value;
+            document.getElementById('historyGraphTitle').innerText = translations[l].hGraph;
+            document.getElementById('searchBtn').innerText = translations[l].search;
+            document.getElementById('historyTitle').innerText = translations[l].history;
+            localStorage.lang = l;
+        }
     </script>
 </body>
 </html>
