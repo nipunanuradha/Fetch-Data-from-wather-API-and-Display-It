@@ -3,24 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WeatherPro Elite v4.0</title>
+    <title>WeatherPro Elite v5.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>tailwind.config = { darkMode: 'class' }</script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&display=swap');
+        .font-mono-clock { font-family: 'JetBrains+Mono', monospace; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-all duration-500 min-h-screen">
 
     <div class="max-w-7xl mx-auto p-4 md:p-8">
         <header class="flex flex-wrap justify-between items-center mb-8 bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800">
-            <div>
-                <h1 class="text-3xl font-black text-blue-600 tracking-tighter italic">WeatherPro <span class="text-slate-400 font-light">Elite Max</span></h1>
-                <div class="flex gap-2 mt-2">
-                    <select id="langSelect" onchange="changeLanguage()" class="bg-slate-100 dark:bg-slate-800 p-1 rounded-lg text-[10px] font-bold outline-none cursor-pointer">
-                        <option value="en">ENGLISH 🇺🇸</option>
-                        <option value="si">සිංහල 🇱🇰</option>
-                    </select>
+            <div class="flex items-center gap-6">
+                <div>
+                    <h1 class="text-3xl font-black text-blue-600 tracking-tighter italic">WeatherPro <span class="text-slate-400 font-light">Elite Max</span></h1>
+                    <div id="live-clock" class="text-lg font-mono-clock text-blue-500 dark:text-blue-400 mt-1">00:00:00</div>
                 </div>
+                <div class="hidden md:block h-10 w-[1px] bg-slate-200 dark:bg-slate-800"></div>
+                <select id="langSelect" onchange="changeLanguage()" class="bg-slate-100 dark:bg-slate-800 p-2 rounded-xl text-xs font-bold outline-none cursor-pointer">
+                    <option value="en">ENGLISH 🇺🇸</option>
+                    <option value="si">සිංහල 🇱🇰</option>
+                </select>
             </div>
+            
             <div class="flex gap-3">
                 <button onclick="startVoiceSearch()" class="p-4 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-2xl hover:scale-110 transition">🎤</button>
                 <button onclick="toggleTheme()" class="p-4 bg-slate-100 dark:bg-slate-800 rounded-2xl transition shadow-md"><span id="theme-icon">🌙</span></button>
@@ -37,6 +45,18 @@
                 </form>
 
                 <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800">
+                    <h3 id="currencyTitle" class="text-[10px] font-black text-slate-400 mb-4 uppercase tracking-widest">Global Market (USD/LKR)</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold">1 USD =</span>
+                            <span class="text-blue-600 font-black">312.45 LKR</span>
+                        </div>
+                        <input type="number" id="usdInput" oninput="convertCurrency()" placeholder="Amount in USD" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-xs border-none outline-none">
+                        <div id="lkrOutput" class="text-center p-2 text-sm font-bold bg-blue-50 dark:bg-blue-900/20 rounded-xl text-blue-500">0.00 LKR</div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800">
                     <h3 id="historyTitle" class="text-[10px] font-black text-slate-400 mb-4 uppercase tracking-widest">Recent Activity</h3>
                     <div class="space-y-2">
                         {% for city in history_list %}
@@ -49,7 +69,7 @@
             <main class="lg:col-span-9 space-y-6">
                 {% if data %}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="rounded-[3rem] overflow-hidden shadow-2xl h-80 border-4 border-white dark:border-slate-800 relative group">
+                    <div class="rounded-[3rem] overflow-hidden shadow-2xl h-80 border-4 border-white dark:border-slate-800 relative">
                         <iframe width="100%" height="100%" src="https://embed.windy.com/embed2.html?lat={{ data.location.lat }}&lon={{ data.location.lon }}&zoom=5&overlay=satellite" frameborder="0"></iframe>
                         <div class="absolute bottom-4 left-4 bg-black/60 text-white text-[10px] px-3 py-1 rounded-full backdrop-blur">LIVE SATELLITE</div>
                     </div>
@@ -60,7 +80,10 @@
                 </div>
 
                 <div class="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-2xl border dark:border-slate-800">
-                    <h3 id="envTitle" class="text-xs font-bold text-blue-500 uppercase mb-6 tracking-widest">Environmental Intelligence Dashboard</h3>
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 id="envTitle" class="text-xs font-bold text-blue-500 uppercase tracking-widest">Environmental Intelligence</h3>
+                        <span class="text-[10px] bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full font-bold">Zone: {{ data.location.tz_id }}</span>
+                    </div>
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                         <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-3xl text-center border-b-4 border-blue-500">
                             <p class="text-[10px] font-bold text-slate-500">RAIN</p>
@@ -80,7 +103,7 @@
                         </div>
                         <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-3xl text-center">
                             <p class="text-[10px] font-bold text-slate-500">PRESSURE</p>
-                            <p class="text-xl font-black">{{ data.current.pressure_mb }}<span class="text-[8px] ml-1 uppercase">mb</span></p>
+                            <p class="text-xl font-black">{{ data.current.pressure_mb }}<span class="text-[8px] ml-1">mb</span></p>
                         </div>
                         <div class="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-3xl text-center border-b-4 border-purple-500">
                             <p class="text-[10px] font-bold text-slate-500">VISIBILITY</p>
@@ -89,48 +112,28 @@
                     </div>
 
                     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-6 pt-6 border-t dark:border-slate-800">
-                        <div class="text-center">
-                            <p class="text-[10px] font-bold text-slate-400">CO (Monoxide)</p>
-                            <p class="font-black">{{ data.current.air_quality.co|round(1) }}</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[10px] font-bold text-slate-400">NO₂ (Dioxide)</p>
-                            <p class="font-black">{{ data.current.air_quality.no2|round(1) }}</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[10px] font-bold text-slate-400">O₃ (Ozone)</p>
-                            <p class="font-black">{{ data.current.air_quality.o3|round(1) }}</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[10px] font-bold text-slate-400">SO₂ (Sulfur)</p>
-                            <p class="font-black">{{ data.current.air_quality.so2|round(1) }}</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[10px] font-bold text-slate-400 text-orange-500">PM 2.5</p>
-                            <p class="font-black">{{ data.current.air_quality.pm2_5|round(1) }}</p>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-[10px] font-bold text-slate-400 text-red-500">PM 10</p>
-                            <p class="font-black">{{ data.current.air_quality.pm10|round(1) }}</p>
-                        </div>
+                        <div class="text-center"><p class="text-[10px] font-bold text-slate-400">CO</p><p class="font-black">{{ data.current.air_quality.co|round(1) }}</p></div>
+                        <div class="text-center"><p class="text-[10px] font-bold text-slate-400">NO₂</p><p class="font-black">{{ data.current.air_quality.no2|round(1) }}</p></div>
+                        <div class="text-center"><p class="text-[10px] font-bold text-slate-400">O₃</p><p class="font-black">{{ data.current.air_quality.o3|round(1) }}</p></div>
+                        <div class="text-center"><p class="text-[10px] font-bold text-slate-400">SO₂</p><p class="font-black">{{ data.current.air_quality.so2|round(1) }}</p></div>
+                        <div class="text-center"><p class="text-[10px] font-bold text-orange-500">PM 2.5</p><p class="font-black">{{ data.current.air_quality.pm2_5|round(1) }}</p></div>
+                        <div class="text-center"><p class="text-[10px] font-bold text-red-500">PM 10</p><p class="font-black">{{ data.current.air_quality.pm10|round(1) }}</p></div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     <div class="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-xl border dark:border-slate-800">
-                        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">7-Day History Trend</h3>
                         <canvas id="historyChart" height="150"></canvas>
                     </div>
                     <div class="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-xl border dark:border-slate-800">
-                        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">24-Hour Temperature Variation</h3>
                         <canvas id="tempChart" height="150"></canvas>
                     </div>
                 </div>
 
                 <div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
                     {% for day in data.forecast.forecastday %}
-                    <div class="min-w-[150px] bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] text-center shadow-lg border border-transparent hover:border-blue-500 transition-all">
-                        <p class="text-[10px] font-black text-slate-400">{{ day.date[5:] }}</p>
+                    <div class="min-w-[150px] bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] text-center shadow-lg hover:border-blue-500 border border-transparent transition-all">
+                        <p class="text-[10px] font-black text-slate-400 uppercase">{{ day.date[5:] }}</p>
                         <img src="{{ day.day.condition.icon }}" class="mx-auto w-12 h-12 my-2">
                         <p class="text-xl font-black">{{ day.day.avgtemp_c|round(0) }}°</p>
                     </div>
@@ -144,35 +147,58 @@
     
 
     <script>
+        // Real-time Clock Logic
+        let timer;
+        function startClock(timezone) {
+            if(timer) clearInterval(timer);
+            timer = setInterval(() => {
+                const now = new Date();
+                const options = { timeZone: timezone, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+                const timeString = new Intl.DateTimeFormat('en-GB', options).format(now);
+                document.getElementById('live-clock').innerText = timeString;
+            }, 1000);
+        }
+
+        // Currency Converter Logic
+        function convertCurrency() {
+            const usd = document.getElementById('usdInput').value;
+            const rate = 312.45; // Fixed Rate (You can fetch live if needed)
+            const result = (usd * rate).toFixed(2);
+            document.getElementById('lkrOutput').innerText = result + " LKR";
+        }
+
         {% if data %}
-            // 1. History Chart (7 Days)
+            // Start clock with city timezone
+            startClock("{{ data.location.tz_id }}");
+
+            // Charts
             new Chart(document.getElementById('historyChart'), {
                 type: 'bar',
                 data: {
                     labels: [{% for item in history_graph %}"{{ item.date }}",{% endfor %}],
-                    datasets: [{
-                        label: 'Temp', data: [{% for item in history_graph %}{{ item.temp }},{% endfor %}],
-                        backgroundColor: '#3b82f6', borderRadius: 12
-                    }]
-                },
-                options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+                    datasets: [{ label: '7-Day History', data: [{% for item in history_graph %}{{ item.temp }},{% endfor %}], backgroundColor: '#3b82f6', borderRadius: 12 }]
+                }
             });
 
-            // 2. Hourly Chart (24H)
             new Chart(document.getElementById('tempChart'), {
                 type: 'line',
                 data: {
                     labels: {{ labels|safe }},
-                    datasets: [{
-                        data: {{ temps|safe }}, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        fill: true, tension: 0.4, borderWidth: 4, pointRadius: 0
-                    }]
-                },
-                options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+                    datasets: [{ data: {{ temps|safe }}, borderColor: '#3b82f6', fill: true, backgroundColor: 'rgba(59, 130, 246, 0.1)', tension: 0.4 }]
+                }
             });
+        {% else %}
+            // Start local clock if no data
+            startClock(Intl.DateTimeFormat().resolvedOptions().timeZone);
         {% endif %}
 
-        // Voice, Theme and Language (Previous Logic Refined)
+        // UI Functions
+        function toggleTheme() {
+            document.getElementById('theme-tag').classList.toggle('dark');
+            localStorage.theme = document.getElementById('theme-tag').classList.contains('dark') ? 'dark' : 'light';
+        }
+        if (localStorage.theme === 'dark') document.getElementById('theme-tag').classList.add('dark');
+
         function startVoiceSearch() {
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = document.getElementById('langSelect').value === 'si' ? 'si-LK' : 'en-US';
@@ -180,19 +206,18 @@
             recognition.start();
         }
 
-        function toggleTheme() {
-            const isDark = document.getElementById('theme-tag').classList.toggle('dark');
-            localStorage.theme = isDark ? 'dark' : 'light';
-        }
-        if (localStorage.theme === 'dark') document.getElementById('theme-tag').classList.add('dark');
-
         function changeLanguage() {
             const l = document.getElementById('langSelect').value;
-            localStorage.lang = l;
-            const t = { en: { env: "Environmental Intelligence", sBtn: "Analyze" }, si: { env: "පාරිසරික බුද්ධි තොරතුරු", sBtn: "විශ්ලේෂණය" } };
+            const t = { 
+                en: { env: "Environmental Intelligence", sBtn: "Analyze", cur: "Global Market (USD/LKR)" }, 
+                si: { env: "පාරිසරික තොරතුරු", sBtn: "විශ්ලේෂණය", cur: "විනිමය අනුපාත (USD/LKR)" } 
+            };
             document.getElementById('envTitle').innerText = t[l].env;
             document.getElementById('searchBtn').innerText = t[l].sBtn;
+            document.getElementById('currencyTitle').innerText = t[l].cur;
+            localStorage.lang = l;
         }
+        if(localStorage.lang) { document.getElementById('langSelect').value = localStorage.lang; changeLanguage(); }
     </script>
 </body>
 </html>

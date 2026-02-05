@@ -11,7 +11,7 @@ app.secret_key = secrets.token_hex(16)
 API_KEY = "1c79708b20d740c097d145309263001"
 fetcher = WeatherFetcher(API_KEY)
 
-# Alert Configurations (Replace with yours)
+# Alert Configurations
 EMAIL_ADDR = "your-email@gmail.com"
 EMAIL_PASS = "your-app-password"
 TW_SID = 'your_sid'; TW_TOKEN = 'your_token'; TW_PHONE = 'your_phone'
@@ -19,13 +19,11 @@ TW_SID = 'your_sid'; TW_TOKEN = 'your_token'; TW_PHONE = 'your_phone'
 def trigger_alerts(city, rain_chance, user_email, user_phone):
     if rain_chance > 70:
         msg = f"⚠️ Alert: High Rain Chance ({rain_chance}%) in {city}!"
-        # Email Logic
         if user_email:
             try:
                 mail = MIMEText(msg); mail['Subject'] = "Weather Alert"; mail['From'] = EMAIL_ADDR; mail['To'] = user_email
                 with smtplib.SMTP_SSL('smtp.gmail.com', 465) as s: s.login(EMAIL_ADDR, EMAIL_PASS); s.send_message(mail)
             except: pass
-        # SMS Logic (Twilio)
         if user_phone:
             try: Client(TW_SID, TW_TOKEN).messages.create(body=msg, from_=TW_PHONE, to=user_phone)
             except: pass
