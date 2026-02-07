@@ -29,7 +29,8 @@ def trigger_alerts(city, rain_chance, user_email, user_phone):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    weather_data, history_graph = None, []
+    weather_data, weather_data2 = None, None
+    history_graph = []
     h_labels, h_temps = [], []
     news_articles = fetcher.fetch_weather_news()
     
@@ -37,10 +38,14 @@ def index():
 
     if request.method == 'POST':
         city = request.form.get('city')
+        city2 = request.form.get('city2') # දෙවන නගරය
         email = request.form.get('email')
         phone = request.form.get('phone')
         
         weather_data = fetcher.fetch_weather(city)
+        if city2:
+            weather_data2 = fetcher.fetch_weather(city2) # දෙවන නගරයේ දත්ත ලබා ගැනීම
+
         if weather_data:
             history_graph = fetcher.fetch_7day_history(city)
             trigger_alerts(city, weather_data['forecast']['forecastday'][0]['day']['daily_chance_of_rain'], email, phone)
@@ -54,9 +59,9 @@ def index():
                 session['history'] = [name] + session['history'][:4]
                 session.modified = True
 
-    return render_template('index.html', data=weather_data, history_list=session['history'], 
-                           labels=h_labels, temps=h_temps, history_graph=history_graph, 
-                           news=news_articles)
+    return render_template('index.html', data=weather_data, data2=weather_data2, 
+                           history_list=session['history'], labels=h_labels, 
+                           temps=h_temps, history_graph=history_graph, news=news_articles)
 
 if __name__ == '__main__':
     app.run(debug=True)
