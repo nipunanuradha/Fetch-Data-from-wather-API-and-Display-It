@@ -69,11 +69,14 @@
                     <div id="eventList" class="mt-4 space-y-2 max-h-40 overflow-y-auto no-scrollbar"></div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800 text-xs font-bold">
-                    <div id="currencyTitle" class="text-[10px] text-slate-400 mb-2 uppercase">Global Market (USD/LKR)</div>
-                    <div class="flex justify-between items-center mb-2"><span>1 USD =</span><span class="text-blue-600">312.45</span></div>
-                    <input type="number" id="usdInput" oninput="convertCurrency()" placeholder="Amount" class="w-full p-2 rounded-lg bg-slate-50 dark:bg-slate-800 mb-2 outline-none">
-                    <div id="lkrOutput" class="text-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-blue-500">0.00 LKR</div>
+                 <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800 text-xs font-bold">
+                    <div id="currencyTitle" class="text-[10px] text-slate-400 mb-2 uppercase italic tracking-widest">Global Market (USD/<span id="targetCurrency">LKR</span>)</div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span>1 USD =</span>
+                        <span id="liveRate" class="text-blue-600 animate-pulse">Fetching...</span>
+                    </div>
+                    <input type="number" id="usdInput" oninput="convertCurrency()" placeholder="Amount in USD" class="w-full p-2 rounded-lg bg-slate-50 dark:bg-slate-800 mb-2 outline-none">
+                    <div id="currencyOutput" class="text-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-blue-500">0.00 LKR</div>
                 </div>
 
                 <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800">
@@ -239,6 +242,48 @@
     </div>
 
     <script>
+    // Currency Logic
+        let currentRate = 312.45; // Default for Sri Lanka
+        let currentCurrency = "LKR";
+
+        async function fetchExchangeRate(countryName) {
+            // Mapping countries to Currency Codes (You can expand this)
+            const countryToCurrency = {
+                "Sri Lanka": "LKR", "India": "INR", "USA": "USD", "United States of America": "USD",
+                "United Kingdom": "GBP", "France": "EUR", "Germany": "EUR", "Japan": "JPY",
+                "Australia": "AUD", "Canada": "CAD", "UAE": "AED", "Saudi Arabia": "SAR"
+            };
+
+            const currencyCode = countryToCurrency[countryName] || "LKR";
+            currentCurrency = currencyCode;
+            document.getElementById('targetCurrency').innerText = currencyCode;
+
+            try {
+                // Using a free API (No key required for basic use - ExchangeRate-API)
+                const response = await fetch(`https://open.er-api.com/v6/latest/USD`);
+                const result = await response.json();
+                
+                if (result && result.rates) {
+                    currentRate = result.rates[currencyCode] || 1.0;
+                    document.getElementById('liveRate').innerText = currentRate.toFixed(2);
+                    document.getElementById('liveRate').classList.remove('animate-pulse');
+                    convertCurrency();
+                }
+            } catch (error) {
+                console.error("Currency fetch failed:", error);
+                document.getElementById('liveRate').innerText = "N/A";
+            }
+        }
+
+        function convertCurrency() {
+            const usd = document.getElementById('usdInput').value;
+            const output = (usd * currentRate).toFixed(2);
+            document.getElementById('currencyOutput').innerText = `${output} ${currentCurrency}`;
+        }
+
+        {% if data %} fetchExchangeRate("{{ data.location.country }}"); {% endif %}
+        
+    //language translations
         const translations = {
             en: {
                 env: "Environmental Intelligence", sBtn: "Analyze & Compare", news: "Live Weather World News", comp: "City Comparison Analysis", cur: "Global Market (USD/LKR)", plan: "Weather-Smart Planner", astro: "Sun & Moon Cycles", sunrise: "Sunrise", sunset: "Sunset", moonrise: "Moonrise", moonset: "Moonset",
@@ -292,7 +337,7 @@
             }
         }
 
-        // --- Core Logic ---
+        // clock logic
         function startClock(timezone) {
             setInterval(() => {
                 const options = { timeZone: timezone, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
@@ -303,11 +348,7 @@
 
         if(localStorage.lang) { document.getElementById('langSelect').value = localStorage.lang; changeLanguage(); }
 
-        function convertCurrency() {
-            const usd = document.getElementById('usdInput').value;
-            document.getElementById('lkrOutput').innerText = (usd * 312.45).toFixed(2) + " LKR";
-        }
-
+        //theams
         function toggleTheme() {
             const isDark = document.getElementById('theme-tag').classList.toggle('dark');
             localStorage.theme = isDark ? 'dark' : 'light';
@@ -317,7 +358,7 @@
             document.getElementById('theme-tag').classList.add('dark');
             document.getElementById('theme-icon').innerText = '🌙';
         }
-
+        //voice search
         function startVoiceSearch() {
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             const langMap = { en: 'en-US', si: 'si-LK', ta: 'ta-LK', fr: 'fr-FR', es: 'es-ES' };
@@ -328,7 +369,7 @@
             };
             recognition.start();
         }
-
+        // event planner
         function addEvent() {
             const title = document.getElementById('eventTitle').value;
             const date = document.getElementById('eventDate').value;
@@ -357,7 +398,7 @@
             renderEvents();
         }
         renderEvents();
-
+        //chart rendering
         {% if data %}
             new Chart(document.getElementById('historyChart'), {
                 type: 'bar',
