@@ -1,5 +1,5 @@
-import secrets, smtplib, os
-from flask import Flask, render_template, request, session, send_from_directory
+import secrets, smtplib
+from flask import Flask, render_template, request, session
 from weather_logic import WeatherFetcher
 from email.mime.text import MIMEText
 from twilio.rest import Client
@@ -14,15 +14,6 @@ fetcher = WeatherFetcher(API_KEY)
 EMAIL_ADDR = "your-email@gmail.com"
 EMAIL_PASS = "your-app-password"
 TW_SID = 'your_sid'; TW_TOKEN = 'your_token'; TW_PHONE = 'your_phone'
-
-# PWA සේවාවන් සඳහා අවශ්‍ය Routes
-@app.route('/manifest.json')
-def serve_manifest():
-    return send_from_directory('static', 'manifest.json')
-
-@app.route('/sw.js')
-def serve_sw():
-    return send_from_directory('static', 'sw.js')
 
 def trigger_alerts(city, rain_chance, user_email, user_phone):
     if rain_chance > 70:
@@ -47,12 +38,13 @@ def index():
 
     if request.method == 'POST':
         city = request.form.get('city')
-        city2 = request.form.get('city2')
+        city2 = request.form.get('city2') # දෙවන නගරය
         email = request.form.get('email')
         phone = request.form.get('phone')
         
         weather_data = fetcher.fetch_weather(city)
-        if city2: weather_data2 = fetcher.fetch_weather(city2)
+        if city2:
+            weather_data2 = fetcher.fetch_weather(city2) # දෙවන නගරයේ දත්ත ලබා ගැනීම
 
         if weather_data:
             history_graph = fetcher.fetch_7day_history(city)
