@@ -2,8 +2,15 @@
 <html lang="en" id="theme-tag">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WeatherPro Elite v9.0</title>
+
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1163/1163736.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>tailwind.config = { darkMode: 'class' }</script>
@@ -11,9 +18,11 @@
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&display=swap');
         .font-mono-clock { font-family: 'JetBrains+Mono', monospace; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        /* Mobile touch improvements */
+        body { -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-all duration-500 min-h-screen">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-all duration-500 min-h-screen select-none">
 
     <div class="max-w-7xl mx-auto p-4 md:p-8">
         <header class="flex flex-wrap justify-between items-center mb-8 bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800">
@@ -242,10 +251,18 @@
     </div>
 
     <script>
+    // --- 1. PWA Service Worker (Register FIRST & OUTSIDE logic) ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('SW Registered'))
+                .catch(err => console.log('SW Registration Failed', err));
+            });
+        }
+        
     // Currency Logic
         let currentRate = 312.45; // Default for Sri Lanka
         let currentCurrency = "LKR";
-
         async function fetchExchangeRate(countryName) {
             // Mapping countries to Currency Codes (You can expand this)
             const countryToCurrency = {

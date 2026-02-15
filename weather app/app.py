@@ -1,5 +1,5 @@
-import secrets, smtplib
-from flask import Flask, render_template, request, session
+import secrets, smtplib, os
+from flask import Flask, render_template, request, session, send_from_directory
 from weather_logic import WeatherFetcher
 from email.mime.text import MIMEText
 from twilio.rest import Client
@@ -14,6 +14,15 @@ fetcher = WeatherFetcher(API_KEY)
 EMAIL_ADDR = "your-email@gmail.com"
 EMAIL_PASS = "your-app-password"
 TW_SID = 'your_sid'; TW_TOKEN = 'your_token'; TW_PHONE = 'your_phone'
+
+# PWA සේවාවන් සඳහා අවශ්‍ය Routes
+@app.route('/manifest.json')
+def serve_manifest():
+    return send_from_directory('static', 'manifest.json')
+
+@app.route('/sw.js')
+def serve_sw():
+    return send_from_directory('static', 'sw.js')
 
 def trigger_alerts(city, rain_chance, user_email, user_phone):
     if rain_chance > 70:
