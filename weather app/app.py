@@ -3,17 +3,28 @@ from flask import Flask, render_template, request, session, send_from_directory
 from weather_logic import WeatherFetcher
 from email.mime.text import MIMEText
 from twilio.rest import Client
+from dotenv import load_dotenv
+
+# load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = secrets.token_hex(16)
+#app.secret_key = secrets.token_hex(16)
+app.secret_key = os.getenv("FLASK_SECRET_KEY", secrets.token_hex(16))
 
-API_KEY = "1c79708b20d740c097d145309263001"
+#API_KEY = "1c79708b20d740c097d145309263001"
+API_KEY = os.getenv("WEATHER_API_KEY")
 fetcher = WeatherFetcher(API_KEY)
 
 # Alerts Config
-EMAIL_ADDR = "your-email@gmail.com"
-EMAIL_PASS = "your-app-password"
-TW_SID = 'your_sid'; TW_TOKEN = 'your_token'; TW_PHONE = 'your_phone'
+#EMAIL_ADDR = "your-email@gmail.com"
+#EMAIL_PASS = "your-app-password"
+#TW_SID = 'your_sid'; TW_TOKEN = 'your_token'; TW_PHONE = 'your_phone'
+EMAIL_ADDR = os.getenv("EMAIL_ADDR")
+EMAIL_PASS = os.getenv("EMAIL_PASS")    
+TW_SID = os.getenv("TW_SID")
+TW_TOKEN = os.getenv("TW_TOKEN")
+TW_PHONE = os.getenv("TW_PHONE")
 
 # PWA සේවාවන් සඳහා අවශ්‍ය Routes
 @app.route('/manifest.json')

@@ -1,12 +1,14 @@
-import requests
+import requests, os
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 
 class WeatherFetcher:
     def __init__(self, api_key):
         self.api_key = api_key
         self.forecast_url = "http://api.weatherapi.com/v1/forecast.json"
         self.history_url = "http://api.weatherapi.com/v1/history.json"
-        self.news_api_key = "e1a536d8f3d146fca027ce533789ecb8" 
+        #self.news_api_key = "e1a536d8f3d146fca027ce533789ecb8" 
+        self.news_api_key = os.getenv("NEWS_API_KEY")
         self.news_url = "https://newsapi.org/v2/everything"
 
     def fetch_weather(self, city):
