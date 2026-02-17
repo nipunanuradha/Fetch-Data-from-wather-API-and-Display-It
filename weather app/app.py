@@ -9,24 +9,19 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-#app.secret_key = secrets.token_hex(16)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", secrets.token_hex(16))
 
-#API_KEY = "1c79708b20d740c097d145309263001"
 API_KEY = os.getenv("WEATHER_API_KEY")
 fetcher = WeatherFetcher(API_KEY)
 
 # Alerts Config
-#EMAIL_ADDR = "your-email@gmail.com"
-#EMAIL_PASS = "your-app-password"
-#TW_SID = 'your_sid'; TW_TOKEN = 'your_token'; TW_PHONE = 'your_phone'
 EMAIL_ADDR = os.getenv("EMAIL_ADDR")
 EMAIL_PASS = os.getenv("EMAIL_PASS")    
 TW_SID = os.getenv("TW_SID")
 TW_TOKEN = os.getenv("TW_TOKEN")
 TW_PHONE = os.getenv("TW_PHONE")
 
-# PWA සේවාවන් සඳහා අවශ්‍ය Routes
+# PWA service Routes
 @app.route('/manifest.json')
 def serve_manifest():
     return send_from_directory('static', 'manifest.json')
@@ -58,13 +53,13 @@ def index():
 
     if request.method == 'POST':
         city = request.form.get('city')
-        city2 = request.form.get('city2') # දෙවන නගරය
+        city2 = request.form.get('city2') # Second city input for comparison
         email = request.form.get('email')
         phone = request.form.get('phone')
         
         weather_data = fetcher.fetch_weather(city)
         if city2:
-            weather_data2 = fetcher.fetch_weather(city2) # දෙවන නගරයේ දත්ත ලබා ගැනීම
+            weather_data2 = fetcher.fetch_weather(city2) # Get weather for second city if provided
 
         if weather_data:
             history_graph = fetcher.fetch_7day_history(city)

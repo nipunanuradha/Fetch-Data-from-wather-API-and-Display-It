@@ -227,6 +227,17 @@
                     <div class="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-xl border dark:border-slate-800"><h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">24-Hour Temp Variation</h3><canvas id="tempChart" height="150"></canvas></div>
                 </div>
 
+                <div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+                    {% for day in data.forecast.forecastday %}
+                    <div class="min-w-[150px] bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] text-center shadow-lg border border-transparent hover:border-blue-500 transition-all duration-300">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ day.date[7:] }}</p>
+                        <img src="{{ day.day.condition.icon }}" class="mx-auto w-12 h-12 my-2">
+                        <p class="text-xl font-black">{{ day.day.avgtemp_c|round(0) }}°C</p>
+                        <p class="text-[8px] font-bold text-blue-500">🌧️ {{ day.day.daily_chance_of_rain }}%</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
                 <div class="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-2xl border dark:border-slate-800">
                     <h3 id="newsTitle" class="text-xs font-bold text-red-500 uppercase tracking-widest mb-6 flex items-center gap-2">
                         <span class="animate-ping h-2 w-2 rounded-full bg-red-500 opacity-75"></span>Live Weather World News

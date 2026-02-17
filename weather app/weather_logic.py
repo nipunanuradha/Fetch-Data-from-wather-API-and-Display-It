@@ -12,8 +12,8 @@ class WeatherFetcher:
         self.news_url = "https://newsapi.org/v2/everything"
 
     def fetch_weather(self, city):
-        # Forecast API එක හරහා 'astro' දත්ත (Sunrise/Sunset) ස්වයංක්‍රීයව ලැබේ
-        params = {'key': self.api_key, 'q': city, 'days': 5, 'aqi': 'yes'}
+        # Forecast API using for get'astro' data (Sunrise/Sunset) in auto-update
+        params = {'key': self.api_key, 'q': city, 'days': 7, 'aqi': 'yes'}
         try:
             response = requests.get(self.forecast_url, params=params)
             return response.json()
@@ -46,7 +46,7 @@ class WeatherFetcher:
                 data = response.json()
                 articles = data.get('articles', [])
                 news_list = []
-                for article in articles[:50]: # පුවත් 50ක් පමණක් ලබා ගනිමු
+                for article in articles[:50]: # Get top 50 articles
                     news_list.append({
                         "title": article.get("title"),
                         "description": article.get("description"),
