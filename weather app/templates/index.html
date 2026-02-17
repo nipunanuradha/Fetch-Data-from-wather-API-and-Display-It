@@ -132,13 +132,42 @@
                     </div>
                 </div>
 
-                  <div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+                <div class="flex items-center justify-between mb-4 mt-8 px-4">
+                    <h3 id="forecastTitle" class="text-sm font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em] italic">Weather Forecast</h3>
+                    <span class="h-[1px] flex-grow mx-4 bg-slate-200 dark:bg-slate-800"></span>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 pb-6">
                     {% for day in data.forecast.forecastday %}
-                    <div class="min-w-[150px] bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] text-center shadow-lg border border-transparent hover:border-blue-500 transition-all duration-300">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ day.date[5:] }}</p>
-                        <img src="{{ day.day.condition.icon }}" class="mx-auto w-12 h-12 my-2">
-                        <p class="text-xl font-black">{{ day.day.avgtemp_c|round(0) }}°C</p>
-                        <p class="text-[8px] font-bold text-blue-500">🌧️ {{ day.day.daily_chance_of_rain }}%</p>
+                    <div class="group bg-white dark:bg-slate-900 p-5 rounded-[2.5rem] text-center shadow-lg border border-transparent hover:border-blue-500 hover:shadow-blue-500/10 hover:-translate-y-2 transition-all duration-500">
+                        <p class="text-[10px] font-black text-slate-400 group-hover:text-blue-500 uppercase tracking-widest transition-colors">
+                            {{ day.date }}
+                        </p>
+                        
+                        <div class="relative py-4">
+                            <img src="{{ day.day.condition.icon }}" class="mx-auto w-16 h-16 drop-shadow-md group-hover:scale-110 transition-transform duration-500">
+                            {% if day.day.daily_chance_of_rain > 50 %}
+                            <span class="absolute top-2 right-2 flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="space-y-1">
+                            <p class="text-2xl font-black text-slate-800 dark:text-white">{{ day.day.avgtemp_c|round(0) }}°</p>
+                            <p class="text-[10px] font-bold text-blue-500/80 dark:text-blue-400/80 italic truncate px-2"> {{ day.day.condition.text }}</p>
+                            <div class="flex justify-center gap-2 text-[10px] font-bold">
+                                <span class="text-orange-500">{{ day.day.maxtemp_c|round(0) }}°</span>
+                                <span class="text-blue-400">{{ day.day.mintemp_c|round(0) }}°</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 py-1.5 px-3 bg-blue-50 dark:bg-blue-900/30 rounded-full">
+                            <p class="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase">
+                                🌧️ {{ day.day.daily_chance_of_rain }}%
+                            </p>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
@@ -315,23 +344,23 @@
         const translations = {
             en: {
                 env: "Environmental Intelligence", sBtn: "Analyze & Compare", news: "Live Weather World News", comp: "City Comparison Analysis", cur: "Global Market (USD/LKR)", plan: "Weather-Smart Planner", astro: "Sun & Moon Cycles", sunrise: "Sunrise", sunset: "Sunset", moonrise: "Moonrise", moonset: "Moonset",
-                city1: "Primary City", city2: "Compare with (Optional)", hTitle: "Recent Activity", addBtn: "Add Event", pName: "Event Name", pFirst: "Search first", rain: "Rain", hum: "Humidity", pres: "Pressure", vis: "Visibility", feat: "Feature", temp: "Temperature", cond: "Condition"
+                city1: "Primary City", city2: "Compare with (Optional)", hTitle: "Recent Activity", addBtn: "Add Event", pName: "Event Name", pFirst: "Search first", rain: "Rain", hum: "Humidity", pres: "Pressure", vis: "Visibility", feat: "Feature", temp: "Temperature", cond: "Condition", forecastTitle: "Weather Forecast"
             },
             si: {
                 env: "පාරිසරික තොරතුරු", sBtn: "විශ්ලේෂණය කරන්න", news: "ලෝක කාලගුණ පුවත්", comp: "නගර සංසන්දනය", cur: "විනිමය අනුපාත", plan: "වැඩ සැලසුම්කරු", astro: "හිරු සහ සඳු චක්‍ර", sunrise: "හිරු උදාව", sunset: "හිරු බැසීම", moonrise: "සඳු උදාව", moonset: "සඳු බැසීම",
-                city1: "ප්‍රධාන නගරය", city2: "සසඳන නගරය (අත්‍යවශ්‍ය නොවේ)", hTitle: "මෑතකදී බැලූ", addBtn: "ඇතුළත් කරන්න", pName: "වැඩසටහන", pFirst: "පළමුව සොයන්න", rain: "වර්ෂාව", hum: "ආර්ද්‍රතාවය", pres: "පීඩනය", vis: "දෘශ්‍යතාව", feat: "විස්තරය", temp: "උෂ්ණත්වය", cond: "තත්ත්වය"
+                city1: "ප්‍රධාන නගරය", city2: "සසඳන නගරය (අත්‍යවශ්‍ය නොවේ)", hTitle: "මෑතකදී බැලූ", addBtn: "ඇතුළත් කරන්න", pName: "වැඩසටහන", pFirst: "පළමුව සොයන්න", rain: "වර්ෂාව", hum: "ආර්ද්‍රතාවය", pres: "පීඩනය", vis: "දෘශ්‍යතාව", feat: "විස්තරය", temp: "උෂ්ණත්වය", cond: "තත්ත්වය", forecastTitle: "කාලගුණ අනාවැකි"
             },
             ta: {
                 env: "சுற்றுச்சூழல் தகவல்", sBtn: "பகுப்பாய்வு மற்றும் ஒப்பிடு", news: "நேரடி உலக வானிலை செய்திகள்", comp: "நகர ஒப்பீடு", cur: "சந்தை (USD/LKR)", plan: "வானிலை திட்டமிடுபவர்", astro: "சூரிய & சந்திர சுழற்சிகள்", sunrise: "சூரிய உதயம்", sunset: "சூரிய அஸ்தமனம்", moonrise: "சந்திர உதயம்", moonset: "சந்திர அஸ்தமனம்",
-                city1: "முக்கிய நகரம்", city2: "ஒப்பீடு (விருப்பமானது)", hTitle: "சமீபத்திய செயல்பாடு", addBtn: "சேர்க்க", pName: "நிகழ்வு பெயர்", pFirst: "முதலில் தேடுங்கள்", rain: "மழை", hum: "ஈரப்பதம்", pres: "அழுத்தம்", vis: "பார்வை", feat: "அம்சம்", temp: "வெப்பநிலை", cond: "நிலை"
+                city1: "முக்கிய நகரம்", city2: "ஒப்பீடு (விருப்பமானது)", hTitle: "சமீபத்திய செயல்பாடு", addBtn: "சேர்க்க", pName: "நிகழ்வு பெயர்", pFirst: "முதலில் தேடுங்கள்", rain: "மழை", hum: "ஈரப்பதம்", pres: "அழுத்தம்", vis: "பார்வை", feat: "அம்சம்", temp: "வெப்பநிலை", cond: "நிலை", forecastTitle: "வானிலை முன்னறிவிப்பு"
             },
             fr: {
                 env: "Intelligence Environnementale", sBtn: "Analyser & Comparer", news: "Nouvelles Météo Mondiales", comp: "Analyse Comparative des Villes", cur: "Marché (USD/LKR)", plan: "Planificateur Météo", astro: "Cycles Soleil & Lune", sunrise: "Lever du soleil", sunset: "Coucher du soleil", moonrise: "Lever de la lune", moonset: "Coucher de la lune",
-                city1: "Ville Principale", city2: "Comparer avec", hTitle: "Activité Récente", addBtn: "Ajouter", pName: "Nom de l'événement", pFirst: "Chercher d'abord", rain: "Pluie", hum: "Humidité", pres: "Pression", vis: "Visibilité", feat: "Caractéristique", temp: "Température", cond: "Condition"
+                city1: "Ville Principale", city2: "Comparer avec", hTitle: "Activité Récente", addBtn: "Ajouter", pName: "Nom de l'événement", pFirst: "Chercher d'abord", rain: "Pluie", hum: "Humidité", pres: "Pression", vis: "Visibilité", feat: "Caractéristique", temp: "Température", cond: "Condition", forecastTitle: "Prévisions Météo"
             },
             es: {
                 env: "Inteligencia Ambiental", sBtn: "Analizar y Comparar", news: "Noticias Meteorológicas", comp: "Análisis Comparativo de Ciudades", cur: "Mercado (USD/LKR)", plan: "Planificador Inteligente", astro: "Ciclos de Sol y Luna", sunrise: "Amanecer", sunset: "Atardecer", moonrise: "Salida de la luna", moonset: "Puesta de la luna",
-                city1: "Ciudad Principal", city2: "Comparar con", hTitle: "Actividad Reciente", addBtn: "Añadir", pName: "Nombre del evento", pFirst: "Buscar primero", rain: "Lluvia", hum: "Humedad", pres: "Presión", vis: "Visibilidad", feat: "Característica", temp: "Temperatura", cond: "Condición"
+                city1: "Ciudad Principal", city2: "Comparar con", hTitle: "Actividad Reciente", addBtn: "Añadir", pName: "Nombre del evento", pFirst: "Buscar primero", rain: "Lluvia", hum: "Humedad", pres: "Presión", vis: "Visibilidad", feat: "Característica", temp: "Temperatura", cond: "Condición", forecastTitle: "Pronóstico del Tiempo"
             }
         };
 

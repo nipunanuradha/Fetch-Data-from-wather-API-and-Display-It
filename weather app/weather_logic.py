@@ -13,7 +13,7 @@ class WeatherFetcher:
 
     def fetch_weather(self, city):
         # Forecast API using for get'astro' data (Sunrise/Sunset) in auto-update
-        params = {'key': self.api_key, 'q': city, 'days': 5, 'aqi': 'yes'}
+        params = {'key': self.api_key, 'q': city, 'days': 7, 'aqi': 'yes'}
         try:
             response = requests.get(self.forecast_url, params=params)
             return response.json()
