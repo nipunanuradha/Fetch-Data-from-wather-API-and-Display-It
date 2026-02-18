@@ -1,4 +1,4 @@
-# 🌤️ WeatherPro Elite Max v10.0
+# 🌤️ WeatherPro Elite Max v1.0
 
 **WeatherPro Elite Max** is a professional-grade, full-stack weather analytics dashboard designed to provide hyper-local real-time weather data, environmental intelligence, and personal planning tools. Built with a focus on high-performance API integration and a seamless UI/UX, it serves as a complete weather command center.
 
