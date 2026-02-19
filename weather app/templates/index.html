@@ -205,9 +205,27 @@
                             <p id="txtRain" class="text-[10px] font-bold text-slate-500 uppercase">Rain</p>
                             <p class="text-xl font-black">{{ data.forecast.forecastday[0].day.daily_chance_of_rain }}%</p>
                         </div>
-                        <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-3xl text-center border-b-4 border-green-500">
-                            <p id="txtAqi" class="text-[10px] font-bold text-slate-500 uppercase">AQI</p>
-                            <p class="text-xl font-black">{{ data.current.air_quality['us-epa-index'] }}</p>
+                        {% set aqi = data.current.air_quality['us-epa-index'] %}
+                        {% if aqi == 1 %}
+                            {% set aqi_style = "bg-green-100 dark:bg-green-900/30 border-green-500 text-green-700 dark:text-green-400" %}
+                            {% set aqi_label = "Good" %}
+                        {% elif aqi == 2 %}
+                            {% set aqi_style = "bg-yellow-100 dark:bg-yellow-900/30 border-yellow-500 text-yellow-700 dark:text-yellow-400" %}
+                            {% set aqi_label = "Moderate" %}
+                        {% elif aqi == 3 %}
+                            {% set aqi_style = "bg-orange-100 dark:bg-orange-900/30 border-orange-500 text-orange-700 dark:text-orange-400" %}
+                            {% set aqi_label = "Sensitive" %}
+                        {% elif aqi == 4 %}
+                            {% set aqi_style = "bg-red-100 dark:bg-red-900/30 border-red-500 text-red-700 dark:text-red-400" %}
+                            {% set aqi_label = "Unhealthy" %}
+                        {% else %}
+                            {% set aqi_style = "bg-purple-100 dark:bg-purple-900/30 border-purple-500 text-purple-700 dark:text-purple-400" %}
+                            {% set aqi_label = "Hazardous" %}
+                        {% endif %}
+
+                        <div class="p-4 rounded-3xl text-center border-b-4 transition-colors duration-500 {{ aqi_style }}">
+                            <p id="txtAqi" class="text-[10px] font-bold opacity-80 uppercase tracking-widest">AQI ({{ aqi_label }})</p>
+                            <p class="text-2xl font-black">{{ aqi }}</p>
                         </div>
                         <div class="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-3xl text-center border-b-4 border-orange-500">
                             <p id="txtUv" class="text-[10px] font-bold text-slate-500 uppercase">UV</p>
@@ -344,7 +362,7 @@
         const translations = {
             en: {
                 env: "Environmental Intelligence", sBtn: "Analyze & Compare", news: "Live Weather World News", comp: "City Comparison Analysis", cur: "Global Market (USD/LKR)", plan: "Weather-Smart Planner", astro: "Sun & Moon Cycles", sunrise: "Sunrise", sunset: "Sunset", moonrise: "Moonrise", moonset: "Moonset",
-                city1: "Primary City", city2: "Compare with (Optional)", hTitle: "Recent Activity", addBtn: "Add Event", pName: "Event Name", pFirst: "Search first", rain: "Rain", hum: "Humidity", pres: "Pressure", vis: "Visibility", feat: "Feature", temp: "Temperature", cond: "Condition", forecastTitle: "Weather Forecast"
+                city1: "Primary City", city2: "Compare with (Optional)", hTitle: "Recent Activity", addBtn: "Add Event", pName: "Event Name", pFirst: "Search first", rain: "Rain", hum: "Humidity", pres: "Pressure", vis: "Visibility", feat: "Feature", temp: "Temperature", cond: "Condition", forecastTitle: "Weather Forecast",
             },
             si: {
                 env: "පාරිසරික තොරතුරු", sBtn: "විශ්ලේෂණය කරන්න", news: "ලෝක කාලගුණ පුවත්", comp: "නගර සංසන්දනය", cur: "විනිමය අනුපාත", plan: "වැඩ සැලසුම්කරු", astro: "හිරු සහ සඳු චක්‍ර", sunrise: "හිරු උදාව", sunset: "හිරු බැසීම", moonrise: "සඳු උදාව", moonset: "සඳු බැසීම",
