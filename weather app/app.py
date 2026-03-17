@@ -31,16 +31,30 @@ def serve_sw():
     return send_from_directory('static', 'sw.js')
 
 def trigger_alerts(city, rain_chance, user_email, user_phone):
-    if rain_chance > 70:
+    try:
+        rain_chance = float(rain_chance)
+    except (TypeError, ValueError):
+        return
+
+    if rain_chance > 70 and city:
         msg = f"⚠️ Alert: High Rain Chance ({rain_chance}%) in {city}!"
-        if user_email:
+        if user_email and EMAIL_ADDR and EMAIL_PASS:
             try:
-                mail = MIMEText(msg); mail['Subject'] = "Weather Alert"; mail['From'] = EMAIL_ADDR; mail['To'] = user_email
-                with smtplib.SMTP_SSL('smtp.gmail.com', 465) as s: s.login(EMAIL_ADDR, EMAIL_PASS); s.send_message(mail)
-            except: pass
-        if user_phone:
-            try: Client(TW_SID, TW_TOKEN).messages.create(body=msg, from_=TW_PHONE, to=user_phone)
-            except: pass
+                mail = MIMEText(msg)
+                mail['Subject'] = "Weather Alert"
+                mail['From'] = EMAIL_ADDR
+                mail['To'] = user_email
+                with smtplib.SMTP_SSL('smtp.gmail.com', 465) as s:
+                    s.login(EMAIL_ADDR, EMAIL_PASS)
+                    s.send_message(mail)
+            except Exception:
+                pass
+
+        if user_phone and TW_SID and TW_TOKEN and TW_PHONE:
+            try:
+                Client(TW_SID, TW_TOKEN).messages.create(body=msg, from_=TW_PHONE, to=user_phone)
+            except Exception:
+                pass
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -61,18 +75,29 @@ def index():
         if city2:
             weather_data2 = fetcher.fetch_weather(city2) # Get weather for second city if provided
 
-        if weather_data:
+        if weather_data and isinstance(weather_data, dict) and 'forecast' in weather_data and 'location' in weather_data:
             history_graph = fetcher.fetch_7day_history(city)
-            trigger_alerts(city, weather_data['forecast']['forecastday'][0]['day']['daily_chance_of_rain'], email, phone)
-            
-            for hour in weather_data['forecast']['forecastday'][0]['hour']:
-                h_labels.append(hour['time'].split(' ')[1])
-                h_temps.append(hour['temp_c'])
-            
-            name = weather_data['location']['name']
-            if name not in session['history']:
-                session['history'] = [name] + session['history'][:4]
-                session.modified = True
+
+            rain_chance = None
+            try:
+                rain_chance = weather_data['forecast']['forecastday'][0]['day'].get('daily_chance_of_rain')
+            except Exception:
+                rain_chance = None
+
+            trigger_alerts(city, rain_chance, email, phone)
+
+            try:
+                for hour in weather_data['forecast']['forecastday'][0]['hour']:
+                    h_labels.append(hour['time'].split(' ')[1])
+                    h_temps.append(hour['temp_c'])
+            except Exception:
+                pass
+
+            name = weather_data['location'].get('name')
+            if name:
+                if name not in session['history']:
+                    session['history'] = [name] + session['history'][:4]
+                    session.modified = True
 
     return render_template('index.html', data=weather_data, data2=weather_data2, 
                            history_list=session['history'], labels=h_labels, 

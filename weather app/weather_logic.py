@@ -12,12 +12,20 @@ class WeatherFetcher:
         self.news_url = "https://newsapi.org/v2/everything"
 
     def fetch_weather(self, city):
-        # Forecast API using for get'astro' data (Sunrise/Sunset) in auto-update
+        if not city or not str(city).strip():
+            return None
+
         params = {'key': self.api_key, 'q': city, 'days': 7, 'aqi': 'yes'}
         try:
-            response = requests.get(self.forecast_url, params=params)
-            return response.json()
-        except: return None
+            response = requests.get(self.forecast_url, params=params, timeout=10)
+            if response.status_code != 200:
+                return None
+            data = response.json()
+            if isinstance(data, dict) and data.get('error'):
+                return None
+            return data
+        except requests.RequestException:
+            return None
 
     def fetch_7day_history(self, city):
         history_data = []
@@ -34,6 +42,9 @@ class WeatherFetcher:
         return history_data[::-1]
 
     def fetch_weather_news(self):
+        if not self.news_api_key:
+            return []
+
         params = {
             'q': 'weather AND climate',
             'language': 'en',
@@ -41,7 +52,7 @@ class WeatherFetcher:
             'apiKey': self.news_api_key
         }
         try:
-            response = requests.get(self.news_url, params=params)
+            response = requests.get(self.news_url, params=params, timeout=10)
             if response.status_code == 200:
                 data = response.json()
                 articles = data.get('articles', [])
@@ -56,4 +67,5 @@ class WeatherFetcher:
                     })
                 return news_list
             return []
-        except: return []
+        except requests.RequestException:
+            return []

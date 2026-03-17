@@ -47,8 +47,8 @@
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <aside class="lg:col-span-3 space-y-6">
-                <form id="searchForm" method="POST" class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-2xl space-y-4 border dark:border-slate-800">
+            <aside class="contents lg:block lg:col-span-3 lg:space-y-6">
+                <form id="searchForm" method="POST" class="order-1 lg:order-none bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-2xl space-y-4 border dark:border-slate-800">
                     <div class="space-y-1">
                         <label id="labelCity1" class="text-[10px] font-bold text-blue-500 ml-2 uppercase">Primary City</label>
                         <input type="text" id="cityInput" name="city" placeholder="Enter City Name" required class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none outline-none focus:ring-2 focus:ring-blue-500 transition">
@@ -62,7 +62,7 @@
                     <button type="submit" id="searchBtn" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold shadow-lg hover:bg-blue-700 transition">Analyze & Compare</button>
                 </form>
 
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800">
+                <div class="order-3 lg:order-none bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800">
                     <h3 id="plannerTitle" class="text-[10px] font-black text-blue-500 mb-4 uppercase tracking-widest italic">Weather-Smart Planner</h3>
                     <div class="space-y-3">
                         <input type="text" id="eventTitle" placeholder="Event Name" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-xs border-none outline-none">
@@ -78,7 +78,7 @@
                     <div id="eventList" class="mt-4 space-y-2 max-h-40 overflow-y-auto no-scrollbar"></div>
                 </div>
 
-                 <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800 text-xs font-bold">
+                 <div class="order-4 lg:order-none bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800 text-xs font-bold">
                     <div id="currencyTitle" class="text-[10px] text-slate-400 mb-2 uppercase italic tracking-widest">Global Market (USD/<span id="targetCurrency">LKR</span>)</div>
                     <div class="flex justify-between items-center mb-2">
                         <span>1 USD =</span>
@@ -88,7 +88,7 @@
                     <div id="currencyOutput" class="text-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-blue-500">0.00 LKR</div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800">
+                <div class="order-5 lg:order-none bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] shadow-xl border dark:border-slate-800">
                     <h3 id="historyTitle" class="text-[10px] font-black text-slate-400 mb-4 uppercase tracking-widest">Recent Activity</h3>
                     <div class="space-y-2">
                         {% for city in history_list %}
@@ -98,7 +98,7 @@
                 </div>
             </aside>
 
-            <main class="lg:col-span-9 space-y-6">
+            <main class="order-2 lg:order-none lg:col-span-9 space-y-6">
                 {% if data %}
                 <div class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-[3.5rem] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden">
                     <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
@@ -292,11 +292,11 @@
                     <div class="h-[400px] overflow-y-auto pr-2 no-scrollbar">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {% for article in news %}
-                            <a href="{{ article.url }}" target="_blank" class="flex gap-4 p-4 rounded-3xl bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition">
-                                <img src="{{ article.image }}" class="w-20 h-20 rounded-2xl object-cover shadow-sm">
+                            <a href="{{ article.url or '#' }}" target="_blank" class="flex gap-4 p-4 rounded-3xl bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition">
+                                <img src="{{ article.image or 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" class="w-20 h-20 rounded-2xl object-cover shadow-sm" alt="News image">
                                 <div class="flex flex-col justify-center">
-                                    <h4 class="text-xs font-bold line-clamp-2">{{ article.title }}</h4>
-                                    <p class="text-[8px] text-slate-400 mt-2">{{ article.publishedAt[:10] }}</p>
+                                    <h4 class="text-xs font-bold line-clamp-2">{{ article.title or 'Weather news headline missing' }}</h4>
+                                    <p class="text-[8px] text-slate-400 mt-2">{{ (article.publishedAt or '')[:10] }}</p>
                                 </div>
                             </a>
                             {% endfor %}
