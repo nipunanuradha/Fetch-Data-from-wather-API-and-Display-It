@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" id="theme-tag">
 <head>
     <meta charset="UTF-8">
@@ -31,8 +31,13 @@
                     <h1 class="text-3xl font-black text-blue-600 tracking-tighter italic">WeatherPro <span class="text-slate-400 font-light">Elite Max</span></h1>
                     <div id="live-clock" class="text-lg font-mono-clock text-blue-500 dark:text-blue-400 mt-1">00:00:00</div>
                 </div>
-                <div class="hidden md:block h-10 w-[1px] bg-slate-200 dark:bg-slate-800"></div>
-                <select id="langSelect" onchange="changeLanguage()" class="bg-slate-100 dark:bg-slate-800 p-2 rounded-xl text-xs font-bold outline-none cursor-pointer">
+                <!-- Navigation Tabs -->
+                <div class="hidden lg:flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl ml-4">
+                    <a href="/" class="px-6 py-2 rounded-xl text-sm font-bold bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400 transition">🌤️ Weather</a>
+                    <a href="/flight" class="px-6 py-2 rounded-xl text-sm font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition">✈️ Flight Tracker</a>
+                </div>
+                <div class="hidden md:block h-10 w-[1px] bg-slate-200 dark:bg-slate-800 ml-4"></div>
+                <select id="langSelect" onchange="changeLanguage()" class="bg-slate-100 dark:bg-slate-800 p-2 rounded-xl text-xs font-bold outline-none cursor-pointer hidden md:block">
                     <option value="en">ENGLISH 🇺🇸</option>
                     <option value="si">සිංහල 🇱🇰</option>
                     <option value="ta">தமிழ் 🇱🇰</option>
@@ -40,11 +45,24 @@
                     <option value="es">ESPAÑOL 🇪🇸</option>
                 </select>
             </div>
-            <div class="flex gap-3">
-                <button onclick="startVoiceSearch()" class="p-4 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-2xl hover:scale-110 transition">🎤</button>
+            <div class="flex gap-3 items-center">
+                <select id="langSelectMobile" onchange="document.getElementById('langSelect').value=this.value; changeLanguage();" class="bg-slate-100 dark:bg-slate-800 p-2 rounded-xl text-xs font-bold outline-none cursor-pointer md:hidden">
+                    <option value="en">EN</option>
+                    <option value="si">SI</option>
+                    <option value="ta">TA</option>
+                    <option value="fr">FR</option>
+                    <option value="es">ES</option>
+                </select>
+                <button onclick="startVoiceSearch()" class="p-4 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-2xl hover:scale-110 transition hidden sm:block">🎤</button>
                 <button onclick="toggleTheme()" class="p-4 bg-slate-100 dark:bg-slate-800 rounded-2xl transition shadow-md"><span id="theme-icon">🌙</span></button>
             </div>
         </header>
+
+        <!-- Mobile Navigation Tabs -->
+        <div class="flex lg:hidden bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl mb-8 w-full">
+            <a href="/" class="flex-1 text-center px-4 py-3 rounded-xl text-sm font-bold bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400 transition">🌤️ Weather</a>
+            <a href="/flight" class="flex-1 text-center px-4 py-3 rounded-xl text-sm font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition">✈️ Flights</a>
+        </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <aside class="contents lg:block lg:col-span-3 lg:space-y-6">

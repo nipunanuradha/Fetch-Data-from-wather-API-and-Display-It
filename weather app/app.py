@@ -1,6 +1,7 @@
 import secrets, smtplib, os
 from flask import Flask, render_template, request, session, send_from_directory
 from weather_logic import WeatherFetcher
+from flight_logic import FlightFetcher
 from email.mime.text import MIMEText
 from twilio.rest import Client
 from dotenv import load_dotenv
@@ -13,6 +14,9 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY", secrets.token_hex(16))
 
 API_KEY = os.getenv("WEATHER_API_KEY")
 fetcher = WeatherFetcher(API_KEY)
+
+FLIGHT_API_KEY = os.getenv("AVIATIONSTACK_API_KEY")
+flight_fetcher = FlightFetcher(FLIGHT_API_KEY)
 
 # Alerts Config
 EMAIL_ADDR = os.getenv("EMAIL_ADDR")
@@ -102,6 +106,26 @@ def index():
     return render_template('index.html', data=weather_data, data2=weather_data2, 
                            history_list=session['history'], labels=h_labels, 
                            temps=h_temps, history_graph=history_graph, news=news_articles)
+
+@app.route('/flight', methods=['GET', 'POST'])
+def flight_tracker():
+    flight_data = None
+    if 'flight_history' not in session: session['flight_history'] = []
+    
+    if request.method == 'POST':
+        flight_number = request.form.get('flight_number')
+        
+        if flight_number:
+            # Dynamically reload key in case .env was modified after server start
+            flight_fetcher.api_key = os.getenv("AVIATIONSTACK_API_KEY")
+            flight_data = flight_fetcher.fetch_flight(flight_number)
+            
+            # Save search history
+            if flight_number.upper() not in session['flight_history']:
+                session['flight_history'] = [flight_number.upper()] + session['flight_history'][:4]
+                session.modified = True
+
+    return render_template('flight.html', data=flight_data, history_list=session['flight_history'])
 
 if __name__ == '__main__':
     app.run(debug=True)
