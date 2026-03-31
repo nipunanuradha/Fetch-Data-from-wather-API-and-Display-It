@@ -1,5 +1,6 @@
 import secrets, smtplib, os
-from flask import Flask, render_template, request, session, send_from_directory
+from flask import Flask, render_template, request, session, send_from_directory, jsonify
+from flask_cors import CORS
 from weather_logic import WeatherFetcher
 from flight_logic import FlightFetcher
 from email.mime.text import MIMEText
@@ -10,6 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", secrets.token_hex(16))
 
 API_KEY = os.getenv("WEATHER_API_KEY")
@@ -60,8 +62,8 @@ def trigger_alerts(city, rain_chance, user_email, user_phone):
             except Exception:
                 pass
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
+@app.route('/api/weather', methods=['GET', 'POST'])
+def api_weather():
     weather_data, weather_data2 = None, None
     history_graph = []
     h_labels, h_temps = [], []
@@ -70,19 +72,23 @@ def index():
     if 'history' not in session: session['history'] = []
 
     if request.method == 'POST':
-        city = request.form.get('city')
-        city2 = request.form.get('city2') # Second city input for comparison
-        email = request.form.get('email')
-        phone = request.form.get('phone')
+        data_req = request.get_json(silent=True) or request.form
+        city = data_req.get('city')
+        city2 = data_req.get('city2')
+        email = data_req.get('email')
+        phone = data_req.get('phone')
         
         # Save to session for persistence
-        session['last_city'] = city
-        session['last_city2'] = city2
+        if city:
+            session['last_city'] = city
+        if city2:
+            session['last_city2'] = city2
         session.modified = True
         
-        weather_data = fetcher.fetch_weather(city)
+        if city:
+            weather_data = fetcher.fetch_weather(city)
         if city2:
-            weather_data2 = fetcher.fetch_weather(city2) # Get weather for second city if provided
+            weather_data2 = fetcher.fetch_weather(city2)# Get weather for second city if provided
 
         if weather_data and isinstance(weather_data, dict) and 'forecast' in weather_data and 'location' in weather_data:
             history_graph = fetcher.fetch_7day_history(city)
@@ -108,7 +114,6 @@ def index():
                     session['history'] = [name] + session['history'][:4]
                     session.modified = True
     else:
-        # Handle GET request - Check for persisted search
         city = session.get('last_city')
         city2 = session.get('last_city2')
         if city:
@@ -125,26 +130,31 @@ def index():
                 except Exception:
                     pass
 
-    return render_template('index.html', data=weather_data, data2=weather_data2, 
-                           history_list=session['history'], labels=h_labels, 
-                           temps=h_temps, history_graph=history_graph, news=news_articles)
+    return jsonify({
+        'data': weather_data,
+        'data2': weather_data2,
+        'history_list': session['history'],
+        'labels': h_labels,
+        'temps': h_temps,
+        'history_graph': history_graph,
+        'news': news_articles
+    })
 
-@app.route('/flight', methods=['GET', 'POST'])
-def flight_tracker():
+@app.route('/api/flight', methods=['GET', 'POST'])
+def api_flight():
     flight_data = None
     if 'flight_history' not in session: session['flight_history'] = []
     
     if request.method == 'POST':
-        search_type = request.form.get('search_type', 'flight')
-        search_query = request.form.get('search_query') or request.form.get('flight_number')
+        data_req = request.get_json(silent=True) or request.form
+        search_type = data_req.get('search_type', 'flight')
+        search_query = data_req.get('search_query') or data_req.get('flight_number')
         
         if search_query:
-            # Save to session for persistence
             session['last_flight_query'] = search_query
             session['last_flight_type'] = search_type
             session.modified = True
 
-            # Dynamically reload key in case .env was modified after server start
             flight_fetcher.api_key = os.getenv("AVIATIONSTACK_API_KEY")
             
             if search_type == 'airport':
@@ -154,15 +164,18 @@ def flight_tracker():
             else:
                 flight_data = flight_fetcher.fetch_flight(search_query)
             
-            # Save search history
             hist_item = f"{search_type.upper()}: {search_query.upper()}" if search_type != 'flight' else search_query.upper()
             if hist_item not in session['flight_history']:
                 session['flight_history'] = [hist_item] + session['flight_history'][:4]
                 session.modified = True
                 
-        return render_template('flight.html', data=flight_data, history_list=session['flight_history'], search_type=search_type, search_query=search_query)
+        return jsonify({
+            'data': flight_data,
+            'history_list': session['flight_history'],
+            'search_type': search_type,
+            'search_query': search_query
+        })
 
-    # Handle GET request - Check for persisted search
     search_query = session.get('last_flight_query')
     search_type = session.get('last_flight_type', 'flight')
     
@@ -175,15 +188,29 @@ def flight_tracker():
         else:
             flight_data = flight_fetcher.fetch_flight(search_query)
 
-    return render_template('flight.html', data=flight_data, history_list=session['flight_history'], search_type=search_type, search_query=search_query or '')
+    return jsonify({
+        'data': flight_data,
+        'history_list': session['flight_history'],
+        'search_type': search_type,
+        'search_query': search_query or ''
+    })
 
-@app.route('/privacy')
-def privacy():
-    return render_template('privacy.html')
+@app.route('/')
+def index_spa():
+    return send_from_directory('www', 'index.html')
 
-@app.route('/terms')
-def terms():
-    return render_template('terms.html')
+@app.route('/index.html')
+def index_html_spa():
+    return send_from_directory('www', 'index.html')
+
+@app.route('/flight')
+@app.route('/flight.html')
+def flight_spa():
+    return send_from_directory('www', 'flight.html')
+
+@app.route('/<path:filename>')
+def serve_www_static(filename):
+    return send_from_directory('www', filename)
 
 if __name__ == '__main__':
     app.run(debug=True)

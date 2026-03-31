@@ -3,3 +3,4 @@ requests
 twilio
 gunicorn
 python-dotenv
+flask-cors
