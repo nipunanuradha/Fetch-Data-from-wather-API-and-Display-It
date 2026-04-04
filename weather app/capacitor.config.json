@@ -10,7 +10,8 @@
     },
     "SplashScreen": {
       "launchShowDuration": 3000,
-      "backgroundColor": "#ffffff",
+      "backgroundColor": "#000000",
+      "spinnerColor": "#ffffff",
       "showSpinner": true,
       "androidScaleType": "CENTER_CROP",
       "splashFullScreen": true,
