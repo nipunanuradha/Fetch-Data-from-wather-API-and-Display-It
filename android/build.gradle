@@ -21,6 +21,8 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        //jcenter()
+        maven { url "https://jcenter.bintray.com/" }
     }
 }
 
